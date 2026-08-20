@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/portfolioAccess/owner) &&
+        request.auth.uid == get(/databases/$(database)/documents/portfolioAccess/owner).data.uid;
+    }
+
+    match /portfolioAccess/{document=**} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+
+    match /portfolio/{document=**} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    match /analytics/portfolio {
+      function hasOnlyCounterFields() {
+        return request.resource.data.keys().hasOnly([
+          'visits', 'profileViews', 'downloads', 'shares'
+        ]) && request.resource.data.keys().hasAll([
+          'visits', 'profileViews', 'downloads', 'shares'
+        ]);
+      }
+
+      function hasValidCounterValues() {
+        return request.resource.data.visits is int &&
+          request.resource.data.profileViews is int &&
+          request.resource.data.downloads is int &&
+          request.resource.data.shares is int &&
+          request.resource.data.visits >= 0 &&
+          request.resource.data.profileViews >= 0 &&
+          request.resource.data.downloads >= 0 &&
+          request.resource.data.shares >= 0;
+      }
+
+      allow read: if true;
+      allow create: if hasOnlyCounterFields() && hasValidCounterValues();
+      allow update: if hasOnlyCounterFields() &&
+        hasValidCounterValues() &&
+        request.resource.data.diff(resource.data).affectedKeys().size() == 1 &&
+        ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visits']) &&
+          request.resource.data.visits == resource.data.visits + 1) ||
+         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profileViews']) &&
+          request.resource.data.profileViews == resource.data.profileViews + 1) ||
+         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads']) &&
+          request.resource.data.downloads == resource.data.downloads + 1) ||
+         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['shares']) &&
+          request.resource.data.shares == resource.data.shares + 1));
+      allow delete: if false;
+    }
+  }
+}
