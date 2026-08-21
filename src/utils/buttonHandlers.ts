@@ -223,7 +223,7 @@ export async function sharePortfolio(): Promise<boolean> {
   shareInFlight = true;
 
   try {
-    const portfolioUrl = 'https://ArchitBishnoiportfolio.com';
+    const portfolioUrl = 'https://architbishnoi-portfolio.vercel.app/';
 
     if (Platform.OS === 'web') {
       if (navigator.share) {
