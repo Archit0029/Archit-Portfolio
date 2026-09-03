@@ -14,16 +14,16 @@ export type AppTheme = {
 };
 
 export const darkTheme: AppTheme = {
-  background: '#171613',
-  surface: '#24221e',
-  surfaceAlt: '#302d27',
-  textPrimary: '#f5f0e8',
-  textSecondary: '#b9b0a2',
-  accent: '#e99555',
-  accentSoft: '#f2bb80',
-  border: '#484239',
-  muted: '#8e8578',
-  overlay: 'rgba(23, 22, 19, 0.72)',
+  background: '#050508',
+  surface: '#0d0d14',
+  surfaceAlt: '#111118',
+  textPrimary: '#e2e2f0',
+  textSecondary: '#8888aa',
+  accent: '#22d3ee',
+  accentSoft: '#a78bfa',
+  border: '#1e1e2e',
+  muted: '#4a4a6a',
+  overlay: 'rgba(5, 5, 8, 0.72)',
 };
 
 export const lightTheme: AppTheme = {

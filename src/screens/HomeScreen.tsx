@@ -260,13 +260,12 @@ export default function HomeScreen() {
     >
       <View style={styles.topBar}>
         <View style={styles.brandLockup}>
-          <Text style={[styles.brandIndex, { color: theme.accent }]}>AB / 01</Text>
-          <Text style={[styles.brandText, { color: theme.textPrimary }]}>ARCHIT BISHNOI</Text>
+          <Text style={[styles.brandIndex, { color: theme.accent }]}>AB_ / 01</Text>
+          <Text style={[styles.brandText, { color: theme.textPrimary }]}>DIGITAL STUDIO</Text>
         </View>
         <View style={styles.toggleRow}>
-          <Text style={[styles.toggleLabel, { color: theme.textSecondary }]}>Light</Text>
+          <Text style={[styles.toggleLabel, { color: theme.textSecondary }]}>MODE</Text>
           <Switch value={themeMode === 'dark'} onValueChange={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')} thumbColor={themeMode === 'dark' ? theme.accent : theme.surface} trackColor={{ false: theme.border, true: theme.accentSoft }} />
-          <Text style={[styles.toggleLabel, { color: theme.textSecondary }]}>Dark</Text>
         </View>
       </View>
 
@@ -296,6 +295,10 @@ export default function HomeScreen() {
           </Pressable>
         ) : null}
         <View style={styles.heroContent}>
+          <View style={styles.heroKicker}>
+            <View style={[styles.pingDot, { backgroundColor: theme.accent }]} />
+            <Text style={[styles.eyebrow, { color: theme.accent }]}>Available for opportunities / 2026</Text>
+          </View>
           <View style={styles.profileHeader}>
             <View style={styles.avatarWrapper}>
               <Pressable onPress={openProfileImage} accessibilityRole="button" accessibilityLabel="View profile picture">
@@ -308,8 +311,8 @@ export default function HomeScreen() {
               ) : null}
             </View>
             <View style={styles.profileMeta}>
-              <Text style={[styles.eyebrow, { color: theme.accent }]}>Student & Professional Portfolio</Text>
-              <Text style={[styles.heading, { color: theme.textPrimary }]}>{profile.name}</Text>
+              <Text style={[styles.heading, { color: theme.textPrimary }]}>{profile.name.split(' ')[0]}</Text>
+              <Text style={[styles.headingAccent, { color: theme.accentSoft }]}>{profile.name.split(' ').slice(1).join(' ')}</Text>
               <Text style={[styles.title, { color: theme.textSecondary }]}>{profile.title}</Text>
               <View style={[styles.statusPill, { backgroundColor: theme.surfaceAlt }]}> 
                 <Text style={[styles.statusText, { color: theme.textPrimary }]}>{profile.status}</Text>
@@ -317,7 +320,8 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <Text style={[styles.description, { color: theme.textSecondary }]}>{profile.bio}</Text>
+          <Text style={[styles.description, { color: theme.textPrimary }]}>{profile.bio}</Text>
+          <Text style={[styles.cursorLine, { color: theme.accent }]}>Full-Stack Developer <Text style={{ color: theme.accentSoft }}>|</Text></Text>
 
           <View style={[styles.progressCard, { backgroundColor: theme.surfaceAlt, borderColor: theme.border }]}> 
             <View style={styles.progressRow}>
@@ -359,7 +363,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <SectionTitle title="Search portfolio" subtitle="Find projects, skills, education, and experience instantly." theme={theme} />
+        <SectionTitle title="Index / Search" subtitle="Find projects, skills, education, and experience instantly." theme={theme} />
         <TextInput
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -370,7 +374,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <SectionTitle title="Personal details" subtitle="A complete snapshot of your professional identity." theme={theme} />
+        <SectionTitle title="01 / About Me" subtitle="A complete snapshot of your professional identity." theme={theme} />
         <View style={[styles.detailCard, { backgroundColor: theme.surface, borderColor: theme.border }]}> 
           <View style={styles.detailGrid}>
             {[
@@ -447,7 +451,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <SectionTitle title="Selected projects" subtitle="Recent work designed for impact and user delight." theme={theme} />
+        <SectionTitle title="03 / Selected Work" subtitle="Recent work designed for impact and user delight." theme={theme} />
         {canEdit ? (
           <OwnerActionRow theme={theme} actions={[{ label: 'Add Project', onPress: () => showToast('Project management coming soon', 'info') }, { label: 'Edit Project', onPress: () => showToast('Project management coming soon', 'info') }, { label: 'Delete Project', onPress: () => showToast('Project management coming soon', 'info') }]} />
         ) : null}
@@ -526,7 +530,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <SectionTitle title="Contact" subtitle="Let’s build something meaningful together." theme={theme} />
+        <SectionTitle title="05 / Contact" subtitle="Let’s build something meaningful together." theme={theme} />
         <View style={[styles.contactCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
           <View style={styles.contactInfo}>
             <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>{contactDetails.email}</Text>
@@ -652,27 +656,34 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 80,
+    paddingHorizontal: 24,
+    paddingTop: 18,
+    paddingBottom: 96,
+    maxWidth: 1180,
+    width: '100%',
+    alignSelf: 'center',
   },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 22,
+    marginBottom: 34,
+    borderBottomWidth: 1,
+    paddingBottom: 16,
+    borderBottomColor: '#1e1e2e',
   },
   brandLockup: {
     gap: 3,
   },
   brandIndex: {
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: 2,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   brandText: {
-    fontSize: 15,
-    letterSpacing: 1.4,
-    fontWeight: '800',
+    fontSize: 13,
+    letterSpacing: 2,
+    fontWeight: '700',
   },
   toggleRow: {
     flexDirection: 'row',
@@ -680,15 +691,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   toggleLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.4,
   },
   heroCard: {
-    borderRadius: 8,
+    borderRadius: 0,
     overflow: 'hidden',
-    marginBottom: 18,
+    marginBottom: 28,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: '#1e1e2e',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.16,
@@ -722,24 +734,37 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
   },
   heroContent: {
-    padding: 22,
-    paddingTop: 30,
+    padding: 28,
+    paddingTop: 34,
+    minHeight: 490,
+    justifyContent: 'flex-end',
+  },
+  heroKicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 22,
+  },
+  pingDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
   },
   profileHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: 16,
-    marginBottom: 18,
+    marginBottom: 20,
   },
   avatarWrapper: {
     position: 'relative',
   },
   avatar: {
-    width: 86,
-    height: 86,
-    borderRadius: 43,
-    borderWidth: 3,
-    borderColor: '#f5f0e8',
+    width: 72,
+    height: 72,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: '#22d3ee',
   },
   profileImageModal: {
     flex: 1,
@@ -819,10 +844,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   heading: {
-    fontSize: 32,
+    fontSize: 54,
     fontWeight: '800',
-    lineHeight: 36,
-    marginBottom: 4,
+    lineHeight: 56,
+    marginBottom: 0,
+    letterSpacing: 0,
+  },
+  headingAccent: {
+    fontSize: 54,
+    fontWeight: '800',
+    lineHeight: 56,
+    marginBottom: 6,
   },
   title: {
     fontSize: 14,
@@ -840,13 +872,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   description: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 24,
     marginBottom: 18,
-    maxWidth: 680,
+    maxWidth: 720,
+  },
+  cursorLine: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginBottom: 18,
   },
   progressCard: {
-    borderRadius: 4,
+    borderRadius: 0,
     padding: 14,
     borderWidth: 1,
     marginBottom: 14,
@@ -879,12 +917,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   primaryButton: {
-    borderRadius: 3,
+    borderRadius: 0,
     paddingVertical: 13,
     paddingHorizontal: 16,
   },
   secondaryButton: {
-    borderRadius: 3,
+    borderRadius: 0,
     paddingVertical: 13,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -892,6 +930,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#ffffff',
     fontWeight: '700',
+    letterSpacing: 0.5,
   },
   secondaryButtonText: {
     fontWeight: '700',
@@ -905,8 +944,8 @@ const styles = StyleSheet.create({
   statCard: {
     flexBasis: '31%',
     minWidth: 100,
-    borderRadius: 4,
-    padding: 16,
+    borderRadius: 0,
+    padding: 14,
     borderWidth: 1,
     minHeight: 82,
   },
@@ -919,17 +958,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   section: {
-    marginBottom: 28,
+    marginBottom: 42,
   },
   searchInput: {
     borderWidth: 1,
-    borderRadius: 3,
+    borderRadius: 0,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 14,
   },
   detailCard: {
-    borderRadius: 4,
+    borderRadius: 0,
     padding: 16,
     borderWidth: 1,
   },
@@ -950,10 +989,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   card: {
-    borderRadius: 4,
+    borderRadius: 0,
     padding: 16,
     borderWidth: 1,
-    marginBottom: 14,
+    marginBottom: 1,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
@@ -961,7 +1000,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
@@ -986,7 +1025,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   tagChip: {
-    borderRadius: 999,
+    borderRadius: 0,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
@@ -1002,7 +1041,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   skillGroupCard: {
-    borderRadius: 4,
+    borderRadius: 0,
     padding: 14,
     borderWidth: 1,
   },
@@ -1017,7 +1056,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   skillChip: {
-    borderRadius: 999,
+    borderRadius: 0,
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
@@ -1036,7 +1075,7 @@ const styles = StyleSheet.create({
   hobbyChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 999,
+    borderRadius: 0,
     paddingHorizontal: 12,
     paddingVertical: 8,
     gap: 6,
@@ -1057,7 +1096,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    borderRadius: 999,
+    borderRadius: 0,
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -1072,7 +1111,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   contactCard: {
-    borderRadius: 4,
+    borderRadius: 0,
     borderWidth: 1,
     overflow: 'hidden',
   },

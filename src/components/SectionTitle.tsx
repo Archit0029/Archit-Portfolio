@@ -21,7 +21,7 @@ export default function SectionTitle({ title, subtitle, theme = darkTheme }: Sec
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 14,
+    marginBottom: 20,
   },
   headingRow: {
     flexDirection: 'row',
@@ -29,17 +29,17 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   rule: {
-    width: 24,
-    height: 3,
+    width: 18,
+    height: 1,
   },
   title: {
-    fontSize: 21,
+    fontSize: 26,
     fontWeight: '800',
-    letterSpacing: 0.2,
+    letterSpacing: 0,
   },
   subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    lineHeight: 20,
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 19,
   },
 });
