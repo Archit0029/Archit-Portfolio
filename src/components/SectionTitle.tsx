@@ -10,7 +10,10 @@ type SectionTitleProps = {
 export default function SectionTitle({ title, subtitle, theme = darkTheme }: SectionTitleProps) {
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: theme.textPrimary }]}>{title}</Text>
+      <View style={styles.headingRow}>
+        <View style={[styles.rule, { backgroundColor: theme.accent }]} />
+        <Text style={[styles.title, { color: theme.textPrimary }]}>{title}</Text>
+      </View>
       {subtitle ? <Text style={[styles.subtitle, { color: theme.textSecondary }]}>{subtitle}</Text> : null}
     </View>
   );
@@ -18,11 +21,21 @@ export default function SectionTitle({ title, subtitle, theme = darkTheme }: Sec
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: 14,
+  },
+  headingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  rule: {
+    width: 24,
+    height: 3,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 21,
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
   subtitle: {
     marginTop: 4,

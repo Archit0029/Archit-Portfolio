@@ -14,29 +14,29 @@ export type AppTheme = {
 };
 
 export const darkTheme: AppTheme = {
-  background: '#07111f',
-  surface: '#0f1b2c',
-  surfaceAlt: '#13233a',
-  textPrimary: '#f5f7fb',
-  textSecondary: '#9fb0cb',
-  accent: '#4cc9f0',
-  accentSoft: '#7bdff2',
-  border: '#233247',
-  muted: '#7d8da7',
-  overlay: 'rgba(7, 17, 31, 0.65)',
+  background: '#171613',
+  surface: '#24221e',
+  surfaceAlt: '#302d27',
+  textPrimary: '#f5f0e8',
+  textSecondary: '#b9b0a2',
+  accent: '#e99555',
+  accentSoft: '#f2bb80',
+  border: '#484239',
+  muted: '#8e8578',
+  overlay: 'rgba(23, 22, 19, 0.72)',
 };
 
 export const lightTheme: AppTheme = {
-  background: '#f4f7fb',
-  surface: '#ffffff',
-  surfaceAlt: '#eef4ff',
-  textPrimary: '#0f172a',
-  textSecondary: '#475569',
-  accent: '#3b82f6',
-  accentSoft: '#93c5fd',
-  border: '#dbe6f2',
-  muted: '#64748b',
-  overlay: 'rgba(15, 23, 42, 0.4)',
+  background: '#f4efe7',
+  surface: '#fffdf8',
+  surfaceAlt: '#ebe3d6',
+  textPrimary: '#24211d',
+  textSecondary: '#665e54',
+  accent: '#c76535',
+  accentSoft: '#e7a27b',
+  border: '#d9cec0',
+  muted: '#93887b',
+  overlay: 'rgba(36, 33, 29, 0.48)',
 };
 
 export const colors = darkTheme;

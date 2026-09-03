@@ -259,7 +259,10 @@ export default function HomeScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.accent} colors={[theme.accent]} />}
     >
       <View style={styles.topBar}>
-        <Text style={[styles.brandText, { color: theme.textPrimary }]}>Archit Bishnoi Portfolio</Text>
+        <View style={styles.brandLockup}>
+          <Text style={[styles.brandIndex, { color: theme.accent }]}>AB / 01</Text>
+          <Text style={[styles.brandText, { color: theme.textPrimary }]}>ARCHIT BISHNOI</Text>
+        </View>
         <View style={styles.toggleRow}>
           <Text style={[styles.toggleLabel, { color: theme.textSecondary }]}>Light</Text>
           <Switch value={themeMode === 'dark'} onValueChange={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')} thumbColor={themeMode === 'dark' ? theme.accent : theme.surface} trackColor={{ false: theme.border, true: theme.accentSoft }} />
@@ -327,11 +330,11 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.actionRow}>
-            <Pressable style={[styles.primaryButton, { backgroundColor: theme.accent }]} onPress={handleDownloadResume}> 
-              <Text style={styles.buttonText}>Download Resume</Text>
+            <Pressable style={({ pressed }) => [styles.primaryButton, { backgroundColor: theme.accent, opacity: pressed ? 0.8 : 1 }]} onPress={handleDownloadResume}>
+              <Text style={styles.buttonText}>Download resume  ↗</Text>
             </Pressable>
-            <Pressable style={[styles.secondaryButton, { borderColor: theme.border }]} onPress={handleSharePortfolio}> 
-              <Text style={[styles.secondaryButtonText, { color: theme.textPrimary }]}>Share Portfolio</Text>
+            <Pressable style={({ pressed }) => [styles.secondaryButton, { borderColor: theme.border, backgroundColor: pressed ? theme.surfaceAlt : 'transparent' }]} onPress={handleSharePortfolio}>
+              <Text style={[styles.secondaryButtonText, { color: theme.textPrimary }]}>Share portfolio</Text>
             </Pressable>
           </View>
           {canEdit ? (
@@ -531,7 +534,7 @@ export default function HomeScreen() {
             <Text style={[styles.cardDescription, { color: theme.textSecondary }]}>{contactDetails.address}</Text>
           </View>
 
-          <View style={styles.contactFormDivider} />
+          <View style={[styles.contactFormDivider, { backgroundColor: theme.border }]} />
 
           <View style={styles.contactForm}>
             <Text style={[styles.formLabel, { color: theme.textPrimary }]}>Send me a message</Text>
@@ -656,10 +659,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 22,
+  },
+  brandLockup: {
+    gap: 3,
+  },
+  brandIndex: {
+    fontSize: 10,
+    letterSpacing: 2,
+    fontWeight: '800',
   },
   brandText: {
-    fontSize: 18,
+    fontSize: 15,
+    letterSpacing: 1.4,
     fontWeight: '800',
   },
   toggleRow: {
@@ -672,11 +684,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   heroCard: {
-    borderRadius: 28,
+    borderRadius: 8,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 18,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.16,
+    shadowRadius: 22,
+    elevation: 5,
   },
   ownerPanel: {
     borderRadius: 20,
@@ -705,24 +722,24 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
   },
   heroContent: {
-    padding: 20,
-    paddingTop: 24,
+    padding: 22,
+    paddingTop: 30,
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    marginBottom: 12,
+    gap: 16,
+    marginBottom: 18,
   },
   avatarWrapper: {
     position: 'relative',
   },
   avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.36)',
+    width: 86,
+    height: 86,
+    borderRadius: 43,
+    borderWidth: 3,
+    borderColor: '#f5f0e8',
   },
   profileImageModal: {
     flex: 1,
@@ -795,16 +812,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   eyebrow: {
-    fontSize: 11,
-    letterSpacing: 1.8,
+    fontSize: 10,
+    letterSpacing: 2,
     textTransform: 'uppercase',
     fontWeight: '700',
     marginBottom: 4,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: '800',
-    lineHeight: 30,
+    lineHeight: 36,
     marginBottom: 4,
   },
   title: {
@@ -823,12 +840,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   description: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 14,
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 18,
+    maxWidth: 680,
   },
   progressCard: {
-    borderRadius: 16,
+    borderRadius: 4,
     padding: 14,
     borderWidth: 1,
     marginBottom: 14,
@@ -861,14 +879,14 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   primaryButton: {
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    borderRadius: 3,
+    paddingVertical: 13,
+    paddingHorizontal: 16,
   },
   secondaryButton: {
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    borderRadius: 3,
+    paddingVertical: 13,
+    paddingHorizontal: 16,
     borderWidth: 1,
   },
   buttonText: {
@@ -881,15 +899,16 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 30,
     flexWrap: 'wrap',
   },
   statCard: {
     flexBasis: '31%',
     minWidth: 100,
-    borderRadius: 16,
-    padding: 14,
+    borderRadius: 4,
+    padding: 16,
     borderWidth: 1,
+    minHeight: 82,
   },
   statValue: {
     fontSize: 18,
@@ -900,17 +919,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   section: {
-    marginBottom: 16,
+    marginBottom: 28,
   },
   searchInput: {
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: 3,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 14,
   },
   detailCard: {
-    borderRadius: 18,
+    borderRadius: 4,
     padding: 16,
     borderWidth: 1,
   },
@@ -931,10 +950,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   card: {
-    borderRadius: 18,
+    borderRadius: 4,
     padding: 16,
     borderWidth: 1,
-    marginBottom: 12,
+    marginBottom: 14,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
   cardTitle: {
     fontSize: 16,
@@ -978,7 +1002,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   skillGroupCard: {
-    borderRadius: 16,
+    borderRadius: 4,
     padding: 14,
     borderWidth: 1,
   },
@@ -1048,7 +1072,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   contactCard: {
-    borderRadius: 18,
+    borderRadius: 4,
     borderWidth: 1,
     overflow: 'hidden',
   },
