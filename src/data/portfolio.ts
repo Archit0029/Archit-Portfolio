@@ -203,7 +203,7 @@ export const socialLinks: SocialLink[] = [
 ];
 
 export const contactDetails = {
-  email: 'architbishnoiportfoliyo@outlook.com',
+  email: 'architbishnoi177@gmail.com',
   phone: '+91 6284946919',
   address: 'Abohar, Fazilka, Punjab, India',
 };

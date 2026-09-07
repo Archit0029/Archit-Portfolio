@@ -14,17 +14,24 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.0",
-    "react-native-web": "^0.21.2"
+    "react-native-web": "^0.21.2",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "~6.0.3",
+    "vite": "^8.2.2"
   },
   "scripts": {
+    "dev": "vite",
+    "build:web": "vite build",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
+    "web": "vite --host 0.0.0.0",
     "build": "expo export --platform web"
   },
   "private": true

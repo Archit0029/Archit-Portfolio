@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import OwnerActionRow from '../components/OwnerActionRow';
 import SectionTitle from '../components/SectionTitle';
@@ -39,8 +40,12 @@ import { subscribeToPortfolioAccess } from '../services/portfolioAccess';
 type ThemeMode = AppThemeMode;
 
 export default function HomeScreen() {
+  const { width } = useWindowDimensions();
+  const isCompact = width < 720;
   const [themeMode, setThemeMode] = useState<ThemeMode>('dark');
   const [searchQuery, setSearchQuery] = useState('');
+  const [typedWord, setTypedWord] = useState('');
+  const [typedWordIndex, setTypedWordIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isOwnerMode, setIsOwnerMode] = useState(false);
@@ -102,6 +107,22 @@ export default function HomeScreen() {
       }),
     ]).start();
   }, [fadeAnim, scaleAnim]);
+
+  useEffect(() => {
+    const words = ['Developer.', 'Builder.', 'Creator.'];
+    const word = words[typedWordIndex];
+    const isComplete = typedWord === word;
+    const timeout = setTimeout(() => {
+      if (isComplete) {
+        setTypedWord('');
+        setTypedWordIndex((index) => (index + 1) % words.length);
+      } else {
+        setTypedWord(word.slice(0, typedWord.length + 1));
+      }
+    }, isComplete ? 1800 : 80);
+
+    return () => clearTimeout(timeout);
+  }, [typedWord, typedWordIndex]);
 
   useEffect(() => {
     const unsubscribe = subscribeToPortfolioAccess((state) => {
@@ -260,8 +281,11 @@ export default function HomeScreen() {
     >
       <View style={styles.topBar}>
         <View style={styles.brandLockup}>
-          <Text style={[styles.brandIndex, { color: theme.accent }]}>AB_ / 01</Text>
-          <Text style={[styles.brandText, { color: theme.textPrimary }]}>DIGITAL STUDIO</Text>
+          <Text style={[styles.brandLogo, { color: theme.textPrimary }]}><Text style={{ color: theme.accent }}>A</Text><Text style={{ color: theme.accent }}>B</Text><Text style={{ color: theme.accentSoft }}>_</Text></Text>
+          <Text style={[styles.brandText, { color: theme.textSecondary }]}>DIGITAL STUDIO / 2026</Text>
+        </View>
+        <View style={[styles.navLinks, isCompact && styles.navLinksCompact]}>
+          {['About', 'Skills', 'Work', 'Contact'].map((label) => <Text key={label} style={[styles.navLink, { color: theme.textSecondary }]}>{label}</Text>)}
         </View>
         <View style={styles.toggleRow}>
           <Text style={[styles.toggleLabel, { color: theme.textSecondary }]}>MODE</Text>
@@ -321,7 +345,7 @@ export default function HomeScreen() {
           </View>
 
           <Text style={[styles.description, { color: theme.textPrimary }]}>{profile.bio}</Text>
-          <Text style={[styles.cursorLine, { color: theme.accent }]}>Full-Stack Developer <Text style={{ color: theme.accentSoft }}>|</Text></Text>
+          <Text style={[styles.cursorLine, { color: theme.accent }]}>Full-Stack {typedWord}<Text style={{ color: theme.accentSoft }}> |</Text></Text>
 
           <View style={[styles.progressCard, { backgroundColor: theme.surfaceAlt, borderColor: theme.border }]}> 
             <View style={styles.progressRow}>
@@ -341,6 +365,10 @@ export default function HomeScreen() {
               <Text style={[styles.secondaryButtonText, { color: theme.textPrimary }]}>Share portfolio</Text>
             </Pressable>
           </View>
+          <View style={styles.scrollCue}>
+            <Text style={[styles.scrollCueLabel, { color: theme.textSecondary }]}>SCROLL TO EXPLORE</Text>
+            <View style={[styles.scrollCueLine, { backgroundColor: theme.accent }]} />
+          </View>
           {canEdit ? (
             <OwnerActionRow
               theme={theme}
@@ -351,7 +379,17 @@ export default function HomeScreen() {
             />
           ) : null}
         </View>
+        <View pointerEvents="none" style={styles.orbitDecoration}>
+          <View style={[styles.orbitRing, styles.orbitRingLarge, { borderColor: theme.border }]} />
+          <View style={[styles.orbitRing, styles.orbitRingMedium, { borderColor: theme.accentSoft }]} />
+          <View style={[styles.orbitRing, styles.orbitRingSmall, { borderColor: theme.accent }]} />
+          <Text style={[styles.orbitCode, { color: theme.accent }]}> &lt;/&gt; </Text>
+        </View>
       </Animated.View>
+
+      <View style={[styles.marqueeBand, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+        <Text style={[styles.marqueeText, { color: theme.textSecondary }]}>REACT  ✦  FIREBASE  ✦  JAVASCRIPT  ✦  FLUTTER  ✦  TYPESCRIPT  ✦  SYSTEMS  ✦  PRODUCT THINKING</Text>
+      </View>
 
       <View style={styles.statsRow}>
         {stats.map((stat) => (
@@ -426,6 +464,24 @@ export default function HomeScreen() {
             </View>
           ))}
         </View>
+        <View style={[styles.skillBars, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+          {[
+            ['Frontend systems', 92],
+            ['Firebase architecture', 86],
+            ['Mobile development', 78],
+            ['Product thinking', 88],
+          ].map(([label, value]) => (
+            <View key={label as string} style={styles.skillBarRow}>
+              <View style={styles.skillBarMeta}>
+                <Text style={[styles.skillBarLabel, { color: theme.textPrimary }]}>{label}</Text>
+                <Text style={[styles.skillBarValue, { color: theme.accent }]}>{value}%</Text>
+              </View>
+              <View style={[styles.skillBarTrack, { backgroundColor: theme.border }]}>
+                <View style={[styles.skillBarFill, { width: `${value}%`, backgroundColor: theme.accent }]} />
+              </View>
+            </View>
+          ))}
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -455,8 +511,10 @@ export default function HomeScreen() {
         {canEdit ? (
           <OwnerActionRow theme={theme} actions={[{ label: 'Add Project', onPress: () => showToast('Project management coming soon', 'info') }, { label: 'Edit Project', onPress: () => showToast('Project management coming soon', 'info') }, { label: 'Delete Project', onPress: () => showToast('Project management coming soon', 'info') }]} />
         ) : null}
-        {filteredProjects.map((project) => (
-          <View key={project.title} style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}> 
+        <View style={styles.projectGrid}>
+        {filteredProjects.map((project, index) => (
+          <View key={project.title} style={[styles.card, styles.projectCard, { backgroundColor: theme.surface, borderColor: theme.border }]}> 
+            <Text style={[styles.projectNumber, { color: index === 2 ? '#f97316' : theme.accent }]}>0{index + 1}</Text>
             <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>{project.title}</Text>
             <Text style={[styles.cardDescription, { color: theme.textSecondary }]}>{project.description}</Text>
             <Text style={[styles.highlightText, { color: theme.accent }]}>{project.highlight}</Text>
@@ -477,6 +535,7 @@ export default function HomeScreen() {
             </View>
           </View>
         ))}
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -491,6 +550,14 @@ export default function HomeScreen() {
             <Text style={[styles.cardDescription, { color: theme.textSecondary }]}>Credential ID: {item.credential}</Text>
           </View>
         ))}
+      </View>
+
+      <View style={[styles.footer, { borderTopColor: theme.border }]}> 
+        <Text style={[styles.footerText, { color: theme.textSecondary }]}>© 2026 ARCHIT BISHNOI / BUILT WITH INTENT</Text>
+        <View style={styles.footerStatus}>
+          <View style={[styles.pingDot, { backgroundColor: theme.accent }]} />
+          <Text style={[styles.footerText, { color: theme.accent }]}>OPEN TO OPPORTUNITIES</Text>
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -675,15 +742,37 @@ const styles = StyleSheet.create({
   brandLockup: {
     gap: 3,
   },
+  brandLogo: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 22,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
   brandIndex: {
     fontSize: 11,
     letterSpacing: 2,
     fontWeight: '700',
   },
   brandText: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 13,
     letterSpacing: 2,
     fontWeight: '700',
+  },
+  navLinks: {
+    flexDirection: 'row',
+    gap: 22,
+    marginLeft: 'auto',
+    marginRight: 28,
+  },
+  navLinksCompact: {
+    display: 'none',
+  },
+  navLink: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 1.1,
   },
   toggleRow: {
     flexDirection: 'row',
@@ -706,6 +795,66 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.16,
     shadowRadius: 22,
     elevation: 5,
+  },
+  orbitDecoration: {
+    position: 'absolute',
+    right: 66,
+    top: 92,
+    width: 290,
+    height: 290,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.78,
+  },
+  orbitRing: {
+    position: 'absolute',
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  orbitRingLarge: {
+    width: 290,
+    height: 290,
+  },
+  orbitRingMedium: {
+    width: 210,
+    height: 210,
+  },
+  orbitRingSmall: {
+    width: 128,
+    height: 128,
+  },
+  orbitCode: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  scrollCue: {
+    alignItems: 'center',
+    marginTop: 28,
+  },
+  scrollCueLabel: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 9,
+    letterSpacing: 1.5,
+  },
+  scrollCueLine: {
+    width: 1,
+    height: 30,
+    marginTop: 8,
+    opacity: 0.7,
+  },
+  marqueeBand: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    paddingVertical: 14,
+    marginBottom: 42,
+    overflow: 'hidden',
+  },
+  marqueeText: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 10,
+    letterSpacing: 1.5,
+    textAlign: 'center',
   },
   ownerPanel: {
     borderRadius: 20,
@@ -844,6 +993,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   heading: {
+    fontFamily: 'Fraunces',
     fontSize: 54,
     fontWeight: '800',
     lineHeight: 56,
@@ -851,12 +1001,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   headingAccent: {
+    fontFamily: 'Fraunces',
     fontSize: 54,
     fontWeight: '800',
     lineHeight: 56,
     marginBottom: 6,
   },
   title: {
+    fontFamily: 'Outfit',
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 8,
@@ -872,6 +1024,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   description: {
+    fontFamily: 'Outfit',
     fontSize: 15,
     lineHeight: 24,
     marginBottom: 18,
@@ -895,10 +1048,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   progressLabel: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 13,
     fontWeight: '600',
   },
   progressValue: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -928,11 +1083,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   buttonText: {
+    fontFamily: 'JetBrains Mono',
     color: '#ffffff',
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   secondaryButtonText: {
+    fontFamily: 'JetBrains Mono',
     fontWeight: '700',
   },
   statsRow: {
@@ -950,10 +1107,12 @@ const styles = StyleSheet.create({
     minHeight: 82,
   },
   statValue: {
+    fontFamily: 'Fraunces',
     fontSize: 18,
     fontWeight: '700',
   },
   statLabel: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 12,
     marginTop: 4,
   },
@@ -981,10 +1140,12 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   detailLabel: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 12,
     marginBottom: 4,
   },
   detailValue: {
+    fontFamily: 'Outfit',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1000,15 +1161,18 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardTitle: {
+    fontFamily: 'Fraunces',
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
   cardMeta: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 13,
     marginBottom: 2,
   },
   cardDescription: {
+    fontFamily: 'Outfit',
     fontSize: 14,
     lineHeight: 21,
     marginTop: 6,
@@ -1030,22 +1194,75 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   tagText: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 12,
     fontWeight: '600',
   },
   linkText: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 13,
     fontWeight: '700',
   },
   skillGroups: {
     gap: 12,
   },
+  skillBars: {
+    borderWidth: 1,
+    padding: 16,
+    marginTop: 12,
+    gap: 16,
+  },
+  skillBarRow: {
+    gap: 7,
+  },
+  skillBarMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  skillBarLabel: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+  },
+  skillBarValue: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 11,
+  },
+  skillBarTrack: {
+    height: 2,
+    overflow: 'hidden',
+  },
+  skillBarFill: {
+    height: '100%',
+  },
   skillGroupCard: {
     borderRadius: 0,
     padding: 14,
     borderWidth: 1,
   },
+  projectGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 1,
+    backgroundColor: '#1e1e2e',
+  },
+  projectCard: {
+    flexBasis: '49.8%',
+    flexGrow: 1,
+    minWidth: 280,
+    marginBottom: 0,
+    minHeight: 230,
+  },
+  projectNumber: {
+    fontFamily: 'Fraunces',
+    fontSize: 52,
+    lineHeight: 58,
+    opacity: 0.18,
+    marginBottom: 8,
+  },
   skillGroupTitle: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 8,
@@ -1061,6 +1278,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   skillText: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1084,6 +1302,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   hobbyText: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1102,6 +1321,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   socialText: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1109,6 +1329,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
+  },
+  footer: {
+    borderTopWidth: 1,
+    paddingTop: 20,
+    paddingBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  footerStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  footerText: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 9,
+    letterSpacing: 0.8,
   },
   contactCard: {
     borderRadius: 0,
@@ -1127,11 +1366,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   formLabel: {
+    fontFamily: 'JetBrains Mono',
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
   },
   formInput: {
+    fontFamily: 'JetBrains Mono',
     borderRadius: 8,
     borderWidth: 1,
     paddingHorizontal: 12,
@@ -1139,6 +1380,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   formTextArea: {
+    fontFamily: 'JetBrains Mono',
     borderRadius: 8,
     borderWidth: 1,
     paddingHorizontal: 12,
@@ -1154,6 +1396,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   submitButtonText: {
+    fontFamily: 'JetBrains Mono',
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
