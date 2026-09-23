@@ -184,6 +184,16 @@ body {
 .instagram-signal span:nth-child(5) { background: #34d399; }
 .instagram-action { color: #fbbf24; }
 
+.mail-modal-backdrop { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 24px; background: #050508dd; backdrop-filter: blur(8px); }
+.mail-modal { width: min(100%, 520px); padding: 32px; background: #0d0d14; border: 1px solid #22d3ee55; box-shadow: 0 24px 80px #00000099, 0 0 40px #22d3ee12; }
+.mail-modal-close { color: #8888aa; font-size: 1.75rem; line-height: 1; transition: color 0.2s ease; }
+.mail-modal-close:hover { color: #22d3ee; }
+.mail-options { display: grid; gap: 10px; margin-top: 28px; }
+.mail-option { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border: 1px solid #1e1e2e; color: #e2e2f0; text-align: left; transition: border-color 0.2s ease, background 0.2s ease; }
+.mail-option:hover { border-color: #22d3ee66; background: #22d3ee08; }
+.mail-option strong { font-family: 'Fraunces', serif; font-size: 1.05rem; }
+.mail-option span { color: #8888aa; font: 0.7rem 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+
 .section-hidden {
   opacity: 0;
   transform: translateY(50px);

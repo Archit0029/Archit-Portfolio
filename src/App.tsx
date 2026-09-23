@@ -159,6 +159,7 @@ function ProjectCard({ project, index }: { project: GitHubProject; index: number
 export default function App() {
   const [cursorPos, setCursorPos] = useState({ x: -400, y: -400 });
   const [navOpen, setNavOpen] = useState(false);
+  const [mailOptionsOpen, setMailOptionsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [typedText, setTypedText] = useState("");
   const [glitchActive, setGlitchActive] = useState(false);
@@ -245,6 +246,28 @@ export default function App() {
     setNavOpen(false);
   };
 
+  useEffect(() => {
+    if (!mailOptionsOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMailOptionsOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [mailOptionsOpen]);
+
+  const openMailOption = (provider: "gmail" | "outlook" | "default") => {
+    const email = "architbishnoi177@gmail.com";
+    if (provider === "default") {
+      window.location.href = `mailto:${email}`;
+    } else {
+      const composeUrl = provider === "gmail"
+        ? `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`
+        : `https://outlook.live.com/mail/0/deeplink/compose?to=${email}`;
+      window.open(composeUrl, "_blank", "noopener,noreferrer");
+    }
+    setMailOptionsOpen(false);
+  };
+
   const navItems = ["home", "about", "skills", "projects", "contact"];
 
   return (
@@ -286,12 +309,13 @@ export default function App() {
           ))}
         </div>
 
-        <a
-          href="mailto:architbishnoi177@gmail.com"
+        <button
+          type="button"
+          onClick={() => setMailOptionsOpen(true)}
           className="hidden md:block cta-btn text-xs"
         >
           Hire Me
-        </a>
+        </button>
 
         {/* Mobile hamburger */}
         <button
@@ -320,6 +344,36 @@ export default function App() {
           </button>
         ))}
       </div>
+
+      {mailOptionsOpen && (
+        <div
+          className="mail-modal-backdrop"
+          role="presentation"
+          onClick={() => setMailOptionsOpen(false)}
+        >
+          <div
+            className="mail-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mail-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-3">Start a conversation</p>
+                <h2 id="mail-modal-title" className="text-3xl font-black text-[#e2e2f0]" style={{ fontFamily: "Fraunces, serif" }}>Choose your mail app</h2>
+              </div>
+              <button type="button" className="mail-modal-close" onClick={() => setMailOptionsOpen(false)} aria-label="Close mail options">×</button>
+            </div>
+            <p className="text-sm text-[#8888aa] mt-3">Send a message to architbishnoi177@gmail.com</p>
+            <div className="mail-options">
+              <button type="button" className="mail-option" onClick={() => openMailOption("gmail")}><strong>Gmail</strong><span>Open compose ↗</span></button>
+              <button type="button" className="mail-option" onClick={() => openMailOption("outlook")}><strong>Outlook</strong><span>Open compose ↗</span></button>
+              <button type="button" className="mail-option" onClick={() => openMailOption("default")}><strong>Other mail app</strong><span>Use default app ↗</span></button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* HERO */}
       <section id="home" className="relative min-h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-20">
