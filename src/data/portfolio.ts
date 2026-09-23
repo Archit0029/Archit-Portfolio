@@ -22,7 +22,7 @@ export const profile = {
   coverImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
   email: 'architbishnoi177@gmail.com',
   phone: '+91 6284946919',
-  address: 'Landran, Mohai, Punjab, India',
+  address: 'Mohali, Punjab, India',
 };
 
 export const stats: Stat[] = [
@@ -205,5 +205,5 @@ export const socialLinks: SocialLink[] = [
 export const contactDetails = {
   email: 'architbishnoi177@gmail.com',
   phone: '+91 6284946919',
-  address: 'Abohar, Fazilka, Punjab, India',
+  address: 'Mohali, Punjab, India',
 };

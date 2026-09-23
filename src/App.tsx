@@ -57,6 +57,10 @@ const MARQUEE_ITEMS = [
   "Redux", "GraphQL", "Docker", "Git", "Figma",
 ];
 
+type GitHubContribution = { date: string; count: number; level: number };
+
+const CONTRIBUTIONS_API_URL = "https://github-contributions-api.jogruber.de/v4/Archit0029?y=last";
+
 function useIntersectionObserver(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -159,16 +163,22 @@ export default function App() {
   const [typedText, setTypedText] = useState("");
   const [glitchActive, setGlitchActive] = useState(false);
   const [projects, setProjects] = useState(FALLBACK_PROJECTS);
+  const [githubContributions, setGithubContributions] = useState<GitHubContribution[]>([]);
 
   const heroWords = ["Developer.", "Builder.", "Creator."];
   const [wordIdx, setWordIdx] = useState(0);
 
   useEffect(() => {
     fetchGitHubProjects(FALLBACK_PROJECTS).then(setProjects);
+    fetch(CONTRIBUTIONS_API_URL)
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("GitHub contributions unavailable")))
+      .then((data: { contributions?: GitHubContribution[] }) => setGithubContributions(data.contributions ?? []))
+      .catch(() => setGithubContributions([]));
   }, []);
 
   // Cursor glow
   useEffect(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     const move = (e: MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
@@ -474,7 +484,7 @@ export default function App() {
 
             <div className="mt-10 grid grid-cols-2 gap-4">
               {[
-                { label: "Location", value: "India" },
+                { label: "Location", value: "Mohali, India" },
                 { label: "Degree", value: "BCA" },
                 { label: "Focus", value: "Full-Stack" },
                 { label: "Status", value: "Open to Work" },
@@ -485,6 +495,77 @@ export default function App() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SOCIAL PRESENCE */}
+      <section id="social" className="social-section py-24 px-8 md:px-16 lg:px-24">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12">
+            <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">03 / Online Presence</p>
+            <h2 className="text-5xl md:text-6xl font-black text-[#e2e2f0]" style={{ fontFamily: "Fraunces, serif" }}>
+              Find Me <em className="text-gradient-cyan not-italic">Online.</em>
+            </h2>
+          </div>
+
+          <div className="social-grid">
+            <article className="social-card github-card">
+              <div className="social-card-header">
+                <span className="social-mark">GH</span>
+                <span className="text-xs font-mono text-[#8888aa] uppercase tracking-widest">Open source / active</span>
+              </div>
+              <h3 className="text-2xl font-black text-[#e2e2f0] mt-8" style={{ fontFamily: "Fraunces, serif" }}>@Archit0029</h3>
+              <p className="text-sm text-[#8888aa] mt-2">Projects, experiments, and the code behind this portfolio.</p>
+              <div className="social-stats">
+                <span><strong>{projects.length}</strong> featured repos</span>
+                <span><strong>{githubContributions.reduce((total, day) => total + day.count, 0)}</strong> contributions</span>
+              </div>
+              <div className="contribution-wrap">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-mono text-[#8888aa] uppercase tracking-wider">Contribution map</span>
+                  <span className="text-xs font-mono text-[#8888aa]">less <span className="contribution-legend" /> more</span>
+                </div>
+                {githubContributions.length ? (
+                  <div className="contribution-map" aria-label="Archit0029's daily GitHub contribution activity">
+                    {Array.from({ length: Math.ceil(githubContributions.length / 7) }, (_, weekIndex) => (
+                      <div className="contribution-week" key={weekIndex}>
+                        {githubContributions.slice(weekIndex * 7, weekIndex * 7 + 7).map((day) => (
+                          <span
+                            key={day.date}
+                            className={`contribution-cell level-${day.level}`}
+                            title={`${day.date}: ${day.count} contribution${day.count === 1 ? "" : "s"}`}
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : <span className="text-xs font-mono text-[#8888aa]">Loading contribution activity...</span>}
+              </div>
+              <a href="https://github.com/Archit0029" target="_blank" rel="noopener noreferrer" className="social-action">View GitHub profile <span>↗</span></a>
+            </article>
+
+            <article className="social-card linkedin-card">
+              <div className="social-card-header">
+                <span className="social-mark">in</span>
+                <span className="text-xs font-mono text-[#8888aa] uppercase tracking-widest">Professional network</span>
+              </div>
+              <h3 className="text-2xl font-black text-[#e2e2f0] mt-8" style={{ fontFamily: "Fraunces, serif" }}>Archit Bishnoi</h3>
+              <p className="text-sm text-[#8888aa] mt-2">BCA student and full-stack developer building practical products.</p>
+              <div className="social-stats"><span><strong>900+</strong> followers</span><span><strong>Open</strong> to connect</span></div>
+              <a href="https://www.linkedin.com/in/archit-29bishnoi" target="_blank" rel="noopener noreferrer" className="social-action">Follow on LinkedIn <span>↗</span></a>
+            </article>
+
+            <article className="social-card instagram-card">
+              <div className="social-card-header">
+                <span className="social-mark">IG</span>
+                <span className="text-xs font-mono text-[#fbbf24] uppercase tracking-widest">Visual log / personal</span>
+              </div>
+              <h3 className="text-2xl font-black text-[#e2e2f0] mt-8" style={{ fontFamily: "Fraunces, serif" }}>@archit_bishnoi029</h3>
+              <p className="text-sm text-[#8888aa] mt-2">A little more color, behind-the-scenes builds, and everyday snapshots.</p>
+              <div className="instagram-signal"><span /> <span /> <span /> <span /> <span /></div>
+              <a href="https://www.instagram.com/archit_bishnoi029/" target="_blank" rel="noopener noreferrer" className="social-action instagram-action">Follow on Instagram <span>↗</span></a>
+            </article>
           </div>
         </div>
       </section>

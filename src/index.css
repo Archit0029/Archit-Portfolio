@@ -155,6 +155,35 @@ body {
 .animate-spin-slow { animation: spin-slow 20s linear infinite; }
 .animate-marquee { animation: marquee 30s linear infinite; }
 
+.social-section { background: #08080d; }
+.social-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: #1e1e2e; }
+.social-card { background: #0d0d14; padding: 32px; min-height: 330px; display: flex; flex-direction: column; }
+.social-card-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.social-mark { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #22d3ee66; color: #22d3ee; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.75rem; }
+.social-stats { display: flex; gap: 24px; margin: 24px 0; color: #8888aa; font: 0.7rem 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
+.social-stats strong { display: block; color: #e2e2f0; font-size: 1.15rem; margin-bottom: 4px; }
+.contribution-wrap { margin-top: auto; padding: 14px; border: 1px solid #1e1e2e; overflow: hidden; }
+.contribution-legend { display: inline-block; width: 42px; height: 7px; margin-left: 4px; vertical-align: middle; background: linear-gradient(90deg, #151522, #22d3ee); }
+.contribution-map { display: flex; gap: 3px; min-width: 470px; }
+.contribution-week { display: grid; gap: 3px; }
+.contribution-cell { width: 7px; height: 7px; background: #151522; border-radius: 1px; }
+.contribution-cell.level-1 { background: #164e63; }
+.contribution-cell.level-2 { background: #0e7490; }
+.contribution-cell.level-3 { background: #22d3ee; }
+.contribution-cell.level-4 { background: #a78bfa; }
+.social-action { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; color: #22d3ee; font: 0.75rem 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; transition: color 0.2s ease; }
+.social-action:hover { color: #e2e2f0; }
+.linkedin-card .social-mark { border-color: #38bdf866; color: #38bdf8; }
+.instagram-card { background: linear-gradient(145deg, #0d0d14 25%, #17121d 100%); }
+.instagram-card .social-mark { border-color: #fbbf2466; color: #fbbf24; border-radius: 9px; }
+.instagram-signal { display: flex; gap: 6px; margin-top: auto; }
+.instagram-signal span { height: 4px; flex: 1; background: #fbbf24; transform: skewX(-25deg); }
+.instagram-signal span:nth-child(2) { background: #fb7185; }
+.instagram-signal span:nth-child(3) { background: #c084fc; }
+.instagram-signal span:nth-child(4) { background: #38bdf8; }
+.instagram-signal span:nth-child(5) { background: #34d399; }
+.instagram-action { color: #fbbf24; }
+
 .section-hidden {
   opacity: 0;
   transform: translateY(50px);
@@ -366,4 +395,19 @@ body {
 .cta-btn-solid:hover {
   background: transparent;
   color: #22d3ee;
+}
+
+@media (max-width: 767px) {
+  .social-grid { grid-template-columns: 1fr; }
+  .social-card { min-height: 290px; padding: 24px; }
+  .social-stats { gap: 14px; flex-wrap: wrap; }
+  .contribution-map { min-width: 0; justify-content: space-between; }
+  .contribution-week { gap: 2px; }
+  .contribution-cell { width: 4px; height: 4px; }
+  .noise-overlay, .scanline, .cursor-glow, .animate-float, .animate-spin-slow { display: none; }
+  .animate-marquee { animation-duration: 45s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
