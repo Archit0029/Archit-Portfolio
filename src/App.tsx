@@ -1,65 +1,71 @@
 import { useEffect, useRef, useState } from "react";
 import { sendPortfolioMessage } from "./services/contactService";
-import { fetchGitHubProjects, type GitHubProject } from "./services/githubProjects";
+import { CONTACT_EMAIL, certifications, education, experience } from "./data/portfolio";
+import type { GitHubProject } from "./services/githubProjects";
 
-const SKILLS = [
-  { name: "React / Next.js", level: 90, cat: "Frontend" },
-  { name: "TypeScript", level: 85, cat: "Frontend" },
-  { name: "React Native", level: 80, cat: "Mobile" },
-  { name: "Node.js / Express", level: 88, cat: "Backend" },
-  { name: "MongoDB / PostgreSQL", level: 82, cat: "Backend" },
-  { name: "Tailwind CSS", level: 92, cat: "Frontend" },
-  { name: "Firebase / Supabase", level: 78, cat: "Backend" },
-  { name: "Git / DevOps", level: 75, cat: "Tools" },
+const SKILL_GROUPS = [
+  { category: "Web", items: ["React", "JavaScript", "HTML", "CSS"] },
+  { category: "Mobile & backend", items: ["Flutter", "Firebase"] },
+  { category: "Programming", items: ["Java", "Python", "C", "C++"] },
+  { category: "Tools", items: ["Git", "GitHub", "VS Code"] },
 ];
 
-const FALLBACK_PROJECTS: GitHubProject[] = [
+const FEATURED_PROJECTS: GitHubProject[] = [
   {
     id: "01",
-    title: "NeuralChat",
-    desc: "Real-time AI chat application with streaming responses, context memory, and multi-modal input. Built with WebSockets and OpenAI API.",
-    tags: ["React", "Node.js", "WebSocket", "OpenAI"],
+    title: "ServiceArc",
+    desc: "A service management project focused on connecting customers with service providers.",
+    tags: ["Web", "Service Management", "Real-Time Tracking"],
     color: "#22d3ee",
-    link: "#",
+    link: "https://github.com/Archit0029/ServiceArc",
   },
   {
     id: "02",
-    title: "TrackFlow",
-    desc: "Cross-platform productivity app for teams. Task management with Kanban boards, time tracking, and analytics dashboard.",
-    tags: ["React Native", "Expo", "Firebase", "Redux"],
+    title: "CampusConnect",
+    desc: "A campus community project for student connections, campus resources, and event information.",
+    tags: ["Campus", "Community", "Web"],
     color: "#a78bfa",
-    link: "#",
+    link: "https://github.com/Archit0029/CampusConnect",
   },
   {
     id: "03",
-    title: "ShopWave",
-    desc: "Full-stack e-commerce platform with payment integration, inventory management, and a recommendation engine.",
-    tags: ["Next.js", "PostgreSQL", "Stripe", "Prisma"],
+    title: "Web Development Online",
+    desc: "Web development learning resources and frontend demonstration projects.",
+    tags: ["HTML", "CSS", "Web"],
     color: "#f97316",
-    link: "#",
-  },
-  {
-    id: "04",
-    title: "DevPulse",
-    desc: "Developer analytics dashboard that aggregates GitHub activity, PR stats, and code metrics into visual insights.",
-    tags: ["React", "D3.js", "GitHub API", "Express"],
-    color: "#22d3ee",
-    link: "#",
+    link: "https://github.com/Archit0029/Web-Development-online",
   },
 ];
 
 const MARQUEE_ITEMS = [
-  "React", "TypeScript", "Node.js", "React Native", "Next.js",
-  "MongoDB", "PostgreSQL", "Firebase", "Tailwind", "Express",
-  "Redux", "GraphQL", "Docker", "Git", "Figma",
-  "React", "TypeScript", "Node.js", "React Native", "Next.js",
-  "MongoDB", "PostgreSQL", "Firebase", "Tailwind", "Express",
-  "Redux", "GraphQL", "Docker", "Git", "Figma",
+  "React", "JavaScript", "HTML", "CSS", "Java", "Python",
+  "Flutter", "Firebase", "Git", "GitHub", "VS Code",
+  "React", "JavaScript", "HTML", "CSS", "Java", "Python",
+  "Flutter", "Firebase", "Git", "GitHub", "VS Code",
 ];
 
 type GitHubContribution = { date: string; count: number; level: number };
+type ContributionStatus = "loading" | "success" | "empty" | "error";
 
 const CONTRIBUTIONS_API_URL = "https://github-contributions-api.jogruber.de/v4/Archit0029?y=last";
+
+function isGitHubContribution(value: unknown): value is GitHubContribution {
+  if (typeof value !== "object" || value === null) return false;
+  const contribution = value as Record<string, unknown>;
+  return (
+    typeof contribution.date === "string" &&
+    typeof contribution.count === "number" &&
+    typeof contribution.level === "number" &&
+    contribution.level >= 0 &&
+    contribution.level <= 4
+  );
+}
+
+function hasContributions(value: unknown): value is { contributions: GitHubContribution[] } {
+  if (typeof value !== "object" || value === null || !("contributions" in value)) return false;
+  const contributions = value.contributions;
+  return Array.isArray(contributions) && contributions.every(isGitHubContribution);
+}
 
 function useIntersectionObserver(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -79,48 +85,16 @@ function useIntersectionObserver(threshold = 0.15) {
   return { ref, visible };
 }
 
-function SkillBar({ name, level, cat, delay = 0 }: { name: string; level: number; cat: string; delay?: number }) {
-  const { ref, visible } = useIntersectionObserver(0.1);
-  const barRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (visible && barRef.current) {
-      setTimeout(() => {
-        if (barRef.current) barRef.current.style.width = `${level}%`;
-      }, delay);
-    }
-  }, [visible, level, delay]);
-
-  return (
-    <div ref={ref} className="group">
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono text-[#8888aa]">[{cat}]</span>
-          <span className="text-sm text-[#e2e2f0] font-medium">{name}</span>
-        </div>
-        <span className="text-xs font-mono text-[#22d3ee]">{level}%</span>
-      </div>
-      <div className="h-[2px] bg-[#1e1e2e] rounded-full overflow-hidden">
-        <div
-          ref={barRef}
-          className="skill-bar-fill"
-          style={{ transitionDelay: `${delay}ms` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function ProjectCard({ project, index }: { project: GitHubProject; index: number }) {
+function ProjectCard({ project, index, reducedMotion }: { project: GitHubProject; index: number; reducedMotion: boolean }) {
   const { ref, visible } = useIntersectionObserver(0.1);
   return (
     <div
       ref={ref}
       className="project-card p-8 rounded-none"
       style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(40px)",
-        transition: `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`,
+        opacity: reducedMotion || visible ? 1 : 0,
+        transform: reducedMotion || visible ? "translateY(0)" : "translateY(40px)",
+        transition: reducedMotion ? "none" : `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`,
       }}
     >
       <div className="flex items-start justify-between mb-6">
@@ -132,8 +106,10 @@ function ProjectCard({ project, index }: { project: GitHubProject; index: number
         </span>
         <a
           href={project.link}
-          className="w-8 h-8 border border-[#1e1e2e] flex items-center justify-center hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all duration-200 text-[#8888aa]"
-          aria-label="View project"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="min-h-11 min-w-11 border border-[#1e1e2e] flex items-center justify-center hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all duration-200 text-[#8888aa]"
+          aria-label={`View ${project.title} on GitHub`}
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -159,22 +135,49 @@ function ProjectCard({ project, index }: { project: GitHubProject; index: number
 export default function App() {
   const [cursorPos, setCursorPos] = useState({ x: -400, y: -400 });
   const [navOpen, setNavOpen] = useState(false);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
   const [mailOptionsOpen, setMailOptionsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [typedText, setTypedText] = useState("");
+  const [typedText, setTypedText] = useState("Developer.");
   const [glitchActive, setGlitchActive] = useState(false);
-  const [projects, setProjects] = useState(FALLBACK_PROJECTS);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [githubContributions, setGithubContributions] = useState<GitHubContribution[]>([]);
+  const [contributionStatus, setContributionStatus] = useState<ContributionStatus>("loading");
 
   const heroWords = ["Developer.", "Builder.", "Creator."];
   const [wordIdx, setWordIdx] = useState(0);
+  const projects = FEATURED_PROJECTS;
 
   useEffect(() => {
-    fetchGitHubProjects(FALLBACK_PROJECTS).then(setProjects);
-    fetch(CONTRIBUTIONS_API_URL)
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error("GitHub contributions unavailable")))
-      .then((data: { contributions?: GitHubContribution[] }) => setGithubContributions(data.contributions ?? []))
-      .catch(() => setGithubContributions([]));
+    const controller = new AbortController();
+
+    const loadContributions = async () => {
+      try {
+        const response = await fetch(CONTRIBUTIONS_API_URL, { signal: controller.signal });
+        if (!response.ok) throw new Error(`GitHub contributions returned ${response.status}`);
+
+        const data: unknown = await response.json();
+        if (!hasContributions(data)) throw new Error("GitHub contributions returned an unexpected response");
+
+        setGithubContributions(data.contributions);
+        setContributionStatus(data.contributions.length ? "success" : "empty");
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("Unable to load GitHub contributions:", error);
+        setContributionStatus("error");
+      }
+    };
+
+    void loadContributions();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener("change", updatePreference);
+    return () => mediaQuery.removeEventListener("change", updatePreference);
   }, []);
 
   // Cursor glow
@@ -187,6 +190,11 @@ export default function App() {
 
   // Typewriter effect
   useEffect(() => {
+    if (prefersReducedMotion) {
+      setTypedText("Developer.");
+      return;
+    }
+
     let timeout: ReturnType<typeof setTimeout>;
     const word = heroWords[wordIdx];
     let i = 0;
@@ -214,20 +222,21 @@ export default function App() {
     };
     type();
     return () => clearTimeout(timeout);
-  }, [wordIdx]);
+  }, [wordIdx, prefersReducedMotion]);
 
   // Random glitch
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const interval = setInterval(() => {
       setGlitchActive(true);
       setTimeout(() => setGlitchActive(false), 200);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [prefersReducedMotion]);
 
   // Scroll spy
   useEffect(() => {
-    const sections = ["home", "about", "skills", "projects", "contact"];
+    const sections = ["home", "projects", "about", "experience", "social", "skills", "contact"];
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => { if (e.isIntersecting) setActiveSection(e.target.id); });
@@ -242,7 +251,7 @@ export default function App() {
   }, []);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(id)?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth" });
     setNavOpen(false);
   };
 
@@ -255,23 +264,36 @@ export default function App() {
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [mailOptionsOpen]);
 
+  useEffect(() => {
+    if (!navOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setNavOpen(false);
+        menuToggleRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [navOpen]);
+
   const openMailOption = (provider: "gmail" | "outlook" | "default") => {
-    const email = "architbishnoi177@gmail.com";
     if (provider === "default") {
-      window.location.href = `mailto:${email}`;
+      window.location.href = `mailto:${CONTACT_EMAIL}`;
     } else {
       const composeUrl = provider === "gmail"
-        ? `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`
-        : `https://outlook.live.com/mail/0/deeplink/compose?to=${email}`;
+        ? `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT_EMAIL}`
+        : `https://outlook.live.com/mail/0/deeplink/compose?to=${CONTACT_EMAIL}`;
       window.open(composeUrl, "_blank", "noopener,noreferrer");
     }
     setMailOptionsOpen(false);
   };
 
-  const navItems = ["home", "about", "skills", "projects", "contact"];
+  const navItems = ["home", "projects", "about", "experience", "social", "skills", "contact"];
 
   return (
     <div className="relative min-h-screen bg-[#050508] overflow-x-hidden">
+      <a className="skip-link" href="#main-content">Skip to content</a>
+
       {/* Ambient cursor glow */}
       <div
         className="cursor-glow"
@@ -288,28 +310,33 @@ export default function App() {
       <div className="grid-bg fixed inset-0 pointer-events-none opacity-40" />
 
       {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 backdrop-blur-sm border-b border-[#1e1e2e40]">
-        <button
-          onClick={() => scrollTo("home")}
+      <nav aria-label="Primary navigation" className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 backdrop-blur-sm border-b border-[#1e1e2e40]">
+        <a
+          href="#home"
+          aria-label="Archit Bishnoi, home"
+          onClick={(event) => { event.preventDefault(); scrollTo("home"); }}
           className="font-mono text-sm text-[#22d3ee] tracking-widest uppercase hover:opacity-70 transition-opacity"
         >
           AB<span className="text-[#a78bfa]">_</span>
-        </button>
+        </a>
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
-            <button
+            <a
               key={item}
-              onClick={() => scrollTo(item)}
+              href={`#${item}`}
+              onClick={(event) => { event.preventDefault(); scrollTo(item); }}
+              aria-current={activeSection === item ? "location" : undefined}
               className={`nav-link ${activeSection === item ? "!text-[#22d3ee]" : ""}`}
             >
               {item}
-            </button>
+            </a>
           ))}
         </div>
 
         <button
+          ref={menuToggleRef}
           type="button"
           onClick={() => setMailOptionsOpen(true)}
           className="hidden md:block cta-btn text-xs"
@@ -319,9 +346,12 @@ export default function App() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden flex flex-col gap-1.5 p-1"
+          type="button"
+          className="md:hidden flex flex-col items-center justify-center gap-1.5 min-h-11 min-w-11"
           onClick={() => setNavOpen(!navOpen)}
-          aria-label="Toggle menu"
+          aria-label={navOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={navOpen}
+          aria-controls="mobile-menu"
         >
           <span className={`block h-px w-6 bg-[#22d3ee] transition-all duration-300 ${navOpen ? "rotate-45 translate-y-2" : ""}`} />
           <span className={`block h-px w-6 bg-[#22d3ee] transition-all duration-300 ${navOpen ? "opacity-0" : ""}`} />
@@ -331,17 +361,23 @@ export default function App() {
 
       {/* Mobile menu */}
       <div
-        className={`fixed inset-0 z-40 bg-[#050508ee] flex flex-col items-center justify-center gap-8 transition-all duration-500 ${navOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        id="mobile-menu"
+        aria-label="Mobile navigation"
+        aria-hidden={!navOpen}
+        hidden={!navOpen}
+        className="fixed inset-0 z-40 bg-[#050508ee] flex flex-col items-center justify-center gap-4"
+        style={{ display: navOpen ? "flex" : "none" }}
       >
         {navItems.map((item) => (
-          <button
+          <a
             key={item}
-            onClick={() => scrollTo(item)}
-            className="text-4xl font-display font-black text-[#e2e2f0] hover:text-[#22d3ee] transition-colors"
+            href={`#${item}`}
+            onClick={(event) => { event.preventDefault(); scrollTo(item); }}
+            className="flex min-h-11 items-center text-4xl font-display font-black text-[#e2e2f0] hover:text-[#22d3ee] transition-colors"
             style={{ fontFamily: "Fraunces, serif" }}
           >
             {item}
-          </button>
+          </a>
         ))}
       </div>
 
@@ -365,7 +401,7 @@ export default function App() {
               </div>
               <button type="button" className="mail-modal-close" onClick={() => setMailOptionsOpen(false)} aria-label="Close mail options">×</button>
             </div>
-            <p className="text-sm text-[#8888aa] mt-3">Send a message to architbishnoi177@gmail.com</p>
+            <p className="text-sm text-[#8888aa] mt-3">Send a message to {CONTACT_EMAIL}</p>
             <div className="mail-options">
               <button type="button" className="mail-option" onClick={() => openMailOption("gmail")}><strong>Gmail</strong><span>Open compose ↗</span></button>
               <button type="button" className="mail-option" onClick={() => openMailOption("outlook")}><strong>Outlook</strong><span>Open compose ↗</span></button>
@@ -375,6 +411,7 @@ export default function App() {
         </div>
       )}
 
+      <main id="main-content" tabIndex={-1}>
       {/* HERO */}
       <section id="home" className="relative min-h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-20">
         {/* Decorative orbit ring */}
@@ -422,38 +459,40 @@ export default function App() {
             Hello, world. I&apos;m
           </p>
           <h1
-            className={`text-6xl md:text-8xl lg:text-9xl font-black leading-none mb-2 text-[#e2e2f0] ${glitchActive ? "glitch" : ""}`}
-            data-text="Archit"
+            aria-label="Archit Bishnoi"
+            className="text-6xl md:text-8xl lg:text-9xl font-black leading-none mb-8"
             style={{ fontFamily: "Fraunces, serif", animationDelay: "0.3s" }}
           >
-            Archit
-          </h1>
-          <h1
-            className="text-6xl md:text-8xl lg:text-9xl font-black leading-none mb-8 text-gradient-cyan"
-            style={{ fontFamily: "Fraunces, serif" }}
-          >
-            Bishnoi
+            <span className={`block text-[#e2e2f0] ${glitchActive ? "glitch" : ""}`} data-text="Archit">Archit</span>
+            <span className="block text-gradient-cyan">Bishnoi</span>
           </h1>
 
-          <div className="flex items-center gap-3 mb-8">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-8">
             <span className="text-xl md:text-2xl text-[#8888aa] font-light">Full-Stack</span>
-            <span className="text-xl md:text-2xl text-[#e2e2f0] font-medium min-w-[180px]">
+            <span className="text-xl md:text-2xl text-[#e2e2f0] font-medium">
               {typedText}
-              <span className="animate-blink text-[#22d3ee]">|</span>
+              {!prefersReducedMotion && <span className="animate-blink text-[#22d3ee]">|</span>}
             </span>
           </div>
 
           <p className="text-[#8888aa] text-base leading-relaxed max-w-xl mb-10">
-            BCA student crafting scalable web & mobile experiences. I turn ambitious ideas into elegant, performant products — from pixel to production.
+            I&apos;m a BCA student building web and mobile projects with JavaScript, React, Firebase, and Flutter.
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <button onClick={() => scrollTo("projects")} className="cta-btn-solid">
+            <a href="#projects" onClick={(event) => { event.preventDefault(); scrollTo("projects"); }} className="cta-btn-solid min-h-11 inline-flex items-center justify-center">
               View My Work
-            </button>
-            <button onClick={() => scrollTo("contact")} className="cta-btn">
+            </a>
+            <a href="/Archit_Bishnoi%20Resume.pdf" download="Archit_Bishnoi_Resume.pdf" className="cta-btn min-h-11 inline-flex items-center justify-center">
+              Download Resume
+            </a>
+            <a href="#contact" onClick={(event) => { event.preventDefault(); scrollTo("contact"); }} className="cta-btn min-h-11 inline-flex items-center justify-center">
               Get In Touch
-            </button>
+            </a>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-6 text-xs font-mono uppercase tracking-wider">
+            <a href="https://github.com/Archit0029" target="_blank" rel="noopener noreferrer" className="text-[#8888aa] hover:text-[#22d3ee]">GitHub ↗</a>
+            <a href="https://www.linkedin.com/in/archit-29bishnoi" target="_blank" rel="noopener noreferrer" className="text-[#8888aa] hover:text-[#22d3ee]">LinkedIn ↗</a>
           </div>
         </div>
 
@@ -476,6 +515,33 @@ export default function App() {
         </div>
       </div>
 
+      {/* PROJECTS */}
+      <section id="projects" className="py-24 px-8 md:px-16 lg:px-24">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">Selected Work</p>
+              <h2 className="text-5xl md:text-6xl font-black text-[#e2e2f0]" style={{ fontFamily: "Fraunces, serif" }}>
+                Projects That <em className="text-gradient-cyan not-italic">Ship.</em>
+              </h2>
+            </div>
+            <a
+              href="https://github.com/Archit0029"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cta-btn text-xs self-start md:self-auto"
+            >
+              All on GitHub →
+            </a>
+          </div>
+          <div className="grid md:grid-cols-2 gap-px bg-[#1e1e2e]">
+            {projects.map((project, i) => (
+              <ProjectCard key={project.id} project={project} index={i} reducedMotion={prefersReducedMotion} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ABOUT */}
       <section id="about" className="py-32 px-8 md:px-16 lg:px-24">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
@@ -483,9 +549,12 @@ export default function App() {
           <div className="relative">
             <div className="relative aspect-[4/5] max-w-sm bg-[#111118]">
               <img
-                src="https://images.unsplash.com/photo-1562813733-b31f71025d54?w=600&h=750&fit=crop&auto=format"
-                alt="Developer at work"
+                src="https://avatars.githubusercontent.com/u/214365719?v=4"
+                alt="Archit Bishnoi"
                 className="w-full h-full object-cover mix-blend-luminosity opacity-60"
+                width="600"
+                height="750"
+                loading="lazy"
               />
               {/* Overlay color wash */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#22d3ee15] to-[#a78bfa15]" />
@@ -495,21 +564,12 @@ export default function App() {
               <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#22d3ee]" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#22d3ee]" />
             </div>
-            {/* Floating stat cards */}
-            <div className="absolute -right-4 top-12 bg-[#0d0d14] border border-[#22d3ee33] p-4 animate-float" style={{ animationDelay: "1s" }}>
-              <div className="text-3xl font-black text-[#22d3ee]" style={{ fontFamily: "Fraunces, serif" }}>20+</div>
-              <div className="text-xs font-mono text-[#8888aa]">Projects Built</div>
-            </div>
-            <div className="absolute -right-8 bottom-16 bg-[#0d0d14] border border-[#a78bfa33] p-4 animate-float" style={{ animationDelay: "2s" }}>
-              <div className="text-3xl font-black text-[#a78bfa]" style={{ fontFamily: "Fraunces, serif" }}>3+</div>
-              <div className="text-xs font-mono text-[#8888aa]">Years Coding</div>
-            </div>
           </div>
 
           {/* Text side */}
           <div>
             <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">
-              01 / About Me
+              About Me
             </p>
             <h2
               className="text-5xl md:text-6xl font-black leading-tight mb-8 text-[#e2e2f0]"
@@ -521,26 +581,19 @@ export default function App() {
             </h2>
             <div className="space-y-4 text-[#8888aa] leading-relaxed">
               <p>
-                I&apos;m a BCA student with a deep obsession for building things on the internet.
-                What started as curiosity about &quot;how websites work&quot; became a full-on
-                passion for crafting seamless digital products.
+                I&apos;m a BCA student based in Mohali, Punjab, interested in building useful web and mobile applications.
               </p>
               <p>
-                I specialize in the full spectrum — from designing pixel-perfect interfaces
-                to architecting robust backend systems and shipping cross-platform mobile apps.
-                My work lives at the intersection of engineering and design.
-              </p>
-              <p>
-                When I&apos;m not writing code, I&apos;m exploring new technologies, contributing
-                to open source, or sketching out the next product idea.
+                My project and internship work includes JavaScript, React, Firebase, and Flutter.
+                I enjoy learning by building and improving practical software.
               </p>
             </div>
 
             <div className="mt-10 grid grid-cols-2 gap-4">
               {[
-                { label: "Location", value: "Mohali, India" },
+                { label: "Location", value: "Mohali, Punjab, India" },
                 { label: "Degree", value: "BCA" },
-                { label: "Focus", value: "Full-Stack" },
+                { label: "Focus", value: "Web & Mobile" },
                 { label: "Status", value: "Open to Work" },
               ].map(({ label, value }) => (
                 <div key={label} className="border-l-2 border-[#22d3ee33] pl-4">
@@ -553,11 +606,69 @@ export default function App() {
         </div>
       </section>
 
+      {/* EXPERIENCE & EDUCATION */}
+      <section id="experience" className="py-24 px-8 md:px-16 lg:px-24 bg-[#0d0d14]">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12">
+            <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">Experience & Education</p>
+            <h2 className="text-5xl md:text-6xl font-black text-[#e2e2f0]" style={{ fontFamily: "Fraunces, serif" }}>
+              The <em className="text-gradient-cyan not-italic">Background.</em>
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            {experience.map((item) => (
+              <article key={`${item.company}-${item.role}`} className="border border-[#1e1e2e] p-6 md:p-8">
+                <p className="text-xs font-mono text-[#22d3ee] uppercase tracking-widest">{item.type} · {item.period}</p>
+                <h3 className="text-2xl font-black text-[#e2e2f0] mt-4" style={{ fontFamily: "Fraunces, serif" }}>{item.role}</h3>
+                <p className="text-sm text-[#a78bfa] mt-1">{item.company}</p>
+                <p className="text-sm text-[#8888aa] leading-relaxed mt-4">{item.description}</p>
+                <div className="flex flex-wrap gap-2 mt-5">
+                  {item.stack.map((itemSkill) => <span key={itemSkill} className="tag-pill">{itemSkill}</span>)}
+                </div>
+              </article>
+            ))}
+
+            <article className="border border-[#1e1e2e] p-6 md:p-8">
+              <h3 className="text-xs font-mono text-[#22d3ee] uppercase tracking-widest mb-5">Education</h3>
+              <div className="space-y-6">
+                {education.map((item) => (
+                  <div key={`${item.institution}-${item.degree}`}>
+                    <p className="text-xs font-mono text-[#8888aa]">{item.period}</p>
+                    <h4 className="text-lg font-bold text-[#e2e2f0] mt-1">{item.degree}</h4>
+                    <p className="text-sm text-[#a78bfa] mt-1">{item.institution}</p>
+                    <p className="text-sm text-[#8888aa] leading-relaxed mt-2">{item.description}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+
+          <div className="mt-8 border border-[#1e1e2e] p-6 md:p-8">
+            <h3 className="text-xs font-mono text-[#22d3ee] uppercase tracking-widest mb-5">Verified Certificates</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              {certifications.filter((certificate) => certificate.link).map((certificate) => (
+                <a
+                  key={certificate.name}
+                  href={certificate.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[#e2e2f0] hover:text-[#22d3ee] transition-colors"
+                >
+                  {certificate.name} <span aria-hidden="true">↗</span>
+                  <span className="block text-xs text-[#8888aa] mt-1">{certificate.issuer} · {certificate.date}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SOCIAL PRESENCE */}
       <section id="social" className="social-section py-24 px-8 md:px-16 lg:px-24">
         <div className="max-w-6xl mx-auto">
           <div className="mb-12">
-            <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">03 / Online Presence</p>
+            <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">Online Presence</p>
             <h2 className="text-5xl md:text-6xl font-black text-[#e2e2f0]" style={{ fontFamily: "Fraunces, serif" }}>
               Find Me <em className="text-gradient-cyan not-italic">Online.</em>
             </h2>
@@ -571,30 +682,35 @@ export default function App() {
               </div>
               <h3 className="text-2xl font-black text-[#e2e2f0] mt-8" style={{ fontFamily: "Fraunces, serif" }}>@Archit0029</h3>
               <p className="text-sm text-[#8888aa] mt-2">Projects, experiments, and the code behind this portfolio.</p>
-              <div className="social-stats">
-                <span><strong>{projects.length}</strong> featured repos</span>
-                <span><strong>{githubContributions.reduce((total, day) => total + day.count, 0)}</strong> contributions</span>
-              </div>
               <div className="contribution-wrap">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-mono text-[#8888aa] uppercase tracking-wider">Contribution map</span>
                   <span className="text-xs font-mono text-[#8888aa]">less <span className="contribution-legend" /> more</span>
                 </div>
-                {githubContributions.length ? (
-                  <div className="contribution-map" aria-label="Archit0029's daily GitHub contribution activity">
-                    {Array.from({ length: Math.ceil(githubContributions.length / 7) }, (_, weekIndex) => (
-                      <div className="contribution-week" key={weekIndex}>
-                        {githubContributions.slice(weekIndex * 7, weekIndex * 7 + 7).map((day) => (
-                          <span
-                            key={day.date}
-                            className={`contribution-cell level-${day.level}`}
-                            title={`${day.date}: ${day.count} contribution${day.count === 1 ? "" : "s"}`}
-                          />
+                {contributionStatus === "success" ? (
+                  <>
+                    <p className="text-xs font-mono text-[#8888aa] mb-3" role="status">
+                      {githubContributions.reduce((total, day) => total + day.count, 0)} contributions in the past year.
+                    </p>
+                    <div className="contribution-scroll">
+                      <div className="contribution-map" aria-hidden="true">
+                        {Array.from({ length: Math.ceil(githubContributions.length / 7) }, (_, weekIndex) => (
+                          <div className="contribution-week" key={weekIndex}>
+                            {githubContributions.slice(weekIndex * 7, weekIndex * 7 + 7).map((day) => (
+                              <span key={day.date} className={`contribution-cell level-${day.level}`} />
+                            ))}
+                          </div>
                         ))}
                       </div>
-                    ))}
-                  </div>
-                ) : <span className="text-xs font-mono text-[#8888aa]">Loading contribution activity...</span>}
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs font-mono text-[#8888aa]" role="status">
+                    {contributionStatus === "loading" && "Loading contribution activity..."}
+                    {contributionStatus === "empty" && "No contribution activity is available for this period."}
+                    {contributionStatus === "error" && "Contribution activity is unavailable right now. Visit GitHub for current work."}
+                  </p>
+                )}
               </div>
               <a href="https://github.com/Archit0029" target="_blank" rel="noopener noreferrer" className="social-action">View GitHub profile <span>↗</span></a>
             </article>
@@ -606,7 +722,7 @@ export default function App() {
               </div>
               <h3 className="text-2xl font-black text-[#e2e2f0] mt-8" style={{ fontFamily: "Fraunces, serif" }}>Archit Bishnoi</h3>
               <p className="text-sm text-[#8888aa] mt-2">BCA student and full-stack developer building practical products.</p>
-              <div className="social-stats"><span><strong>900+</strong> followers</span><span><strong>Open</strong> to connect</span></div>
+              <p className="text-sm text-[#8888aa] mt-6">Connect with me for professional updates and opportunities.</p>
               <a href="https://www.linkedin.com/in/archit-29bishnoi" target="_blank" rel="noopener noreferrer" className="social-action">Follow on LinkedIn <span>↗</span></a>
             </article>
 
@@ -629,7 +745,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
             <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">
-              02 / Skills & Stack
+              Skills & Stack
             </p>
             <h2
               className="text-5xl md:text-6xl font-black text-[#e2e2f0]"
@@ -640,71 +756,14 @@ export default function App() {
             </h2>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16">
-            <div className="space-y-8">
-              {SKILLS.map((skill, i) => (
-                <SkillBar key={skill.name} {...skill} delay={i * 100} />
-              ))}
-            </div>
-
-            <div className="space-y-8">
-              {/* Tech cluster visual */}
-              <div className="border-glow p-8 space-y-6">
-                <h3 className="text-xs font-mono text-[#8888aa] uppercase tracking-widest">
-                  Tech Ecosystem
-                </h3>
-                {[
-                  { label: "Frontend", items: ["React", "Next.js", "TypeScript", "Tailwind", "Framer Motion"] },
-                  { label: "Backend", items: ["Node.js", "Express", "GraphQL", "REST", "WebSocket"] },
-                  { label: "Mobile", items: ["React Native", "Expo", "Android", "iOS"] },
-                  { label: "Data", items: ["MongoDB", "PostgreSQL", "Redis", "Prisma", "Firebase"] },
-                  { label: "Tools", items: ["Git", "Docker", "Vercel", "Figma", "VS Code"] },
-                ].map(({ label, items }) => (
-                  <div key={label}>
-                    <div className="text-xs font-mono text-[#22d3ee] mb-2 uppercase tracking-wider">{label}</div>
-                    <div className="flex flex-wrap gap-2">
-                      {items.map((item) => (
-                        <span key={item} className="tag-pill cursor-default">{item}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {SKILL_GROUPS.map(({ category, items }) => (
+              <div key={category} className="border-glow p-6">
+                <h3 className="text-xs font-mono text-[#22d3ee] uppercase tracking-widest mb-4">{category}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {items.map((item) => <span key={item} className="tag-pill">{item}</span>)}
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PROJECTS */}
-      <section id="projects" className="py-32 px-8 md:px-16 lg:px-24">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">
-                03 / Selected Work
-              </p>
-              <h2
-                className="text-5xl md:text-6xl font-black text-[#e2e2f0]"
-                style={{ fontFamily: "Fraunces, serif" }}
-              >
-                Projects That
-                <br />
-                <em className="text-gradient-cyan not-italic">Ship.</em>
-              </h2>
-            </div>
-            <a
-              href="https://github.com/Archit0029"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cta-btn text-xs self-start md:self-auto"
-            >
-              All on GitHub →
-            </a>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-px bg-[#1e1e2e]">
-            {projects.map((project, i) => (
-              <ProjectCard key={project.id} project={project} index={i} />
             ))}
           </div>
         </div>
@@ -716,7 +775,7 @@ export default function App() {
           <div className="grid lg:grid-cols-2 gap-20 items-start">
             <div>
               <p className="text-xs font-mono text-[#22d3ee] tracking-widest uppercase mb-4">
-                04 / Contact
+                Contact
               </p>
               <h2
                 className="text-5xl md:text-6xl font-black text-[#e2e2f0] leading-tight mb-8"
@@ -730,17 +789,20 @@ export default function App() {
                 I&apos;m currently available for freelance work, internships, and collaborative projects.
                 If you have an idea — let&apos;s make it real.
               </p>
+              <p className="text-sm text-[#8888aa] mb-8">
+                Prefer email? <a className="text-[#22d3ee] hover:underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+              </p>
               <div className="space-y-4">
                 {[
-                  { label: "Email", value: "architbishnoi177@gmail.com", href: "mailto:architbishnoi177@gmail.com" },
+                  { label: "Email", value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
                   { label: "GitHub", value: "github.com/Archit0029", href: "https://github.com/Archit0029" },
-                  { label: "LinkedIn", value: "linkedin.com/in/Archit-29bishnoi", href: "https://www.linkedin.com/in/Archit-29bishnoi" },
+                  { label: "LinkedIn", value: "linkedin.com/in/archit-29bishnoi", href: "https://www.linkedin.com/in/archit-29bishnoi" },
                 ].map(({ label, value, href }) => (
                   <a
                     key={label}
                     href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target={href.startsWith("http") ? "_blank" : undefined}
+                    rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                     className="flex items-center gap-4 group"
                   >
                     <span className="text-xs font-mono text-[#8888aa] w-16 uppercase tracking-wider shrink-0">{label}</span>
@@ -761,12 +823,13 @@ export default function App() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* FOOTER */}
       <footer className="border-t border-[#1e1e2e] py-8 px-8 md:px-16 lg:px-24">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-xs font-mono text-[#8888aa]">
-            © 2024 Archit Bishnoi — Designed & Built with obsession
+            © {new Date().getFullYear()} Archit Bishnoi
           </span>
           <div className="flex items-center gap-2">
             <span className="relative flex h-1.5 w-1.5">
@@ -782,7 +845,7 @@ export default function App() {
 }
 
 function ContactForm() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", message: "", website: "" });
   const [submitted, setSubmitted] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -809,7 +872,7 @@ function ContactForm() {
         <h3 className="text-xl font-display font-bold text-[#e2e2f0]" style={{ fontFamily: "Fraunces, serif" }}>
           Message Sent
         </h3>
-        <p className="text-sm text-[#8888aa]">I&apos;ll get back to you within 24 hours.</p>
+        <p className="text-sm text-[#8888aa]">Thanks for reaching out. Your message was submitted.</p>
       </div>
     );
   }
@@ -835,8 +898,10 @@ function ContactForm() {
             onChange={(e) => setForm({ ...form, [id]: e.target.value })}
             onFocus={() => setFocused(id)}
             onBlur={() => setFocused(null)}
+            autoComplete={id === "name" ? "name" : "email"}
+            maxLength={id === "name" ? 80 : 254}
             required
-            className="w-full bg-[#111118] border text-[#e2e2f0] text-sm px-4 py-3 outline-none transition-colors placeholder:text-[#4a4a6a] font-mono"
+            className="w-full min-h-11 bg-[#111118] border text-[#e2e2f0] text-sm px-4 py-3 outline-none transition-colors placeholder:text-[#8888aa] font-mono"
             style={{
               borderColor: focused === id ? "#22d3ee55" : "#1e1e2e",
             }}
@@ -855,15 +920,31 @@ function ContactForm() {
           onChange={(e) => setForm({ ...form, message: e.target.value })}
           onFocus={() => setFocused("message")}
           onBlur={() => setFocused(null)}
+          maxLength={2000}
           required
-          className="w-full bg-[#111118] border text-[#e2e2f0] text-sm px-4 py-3 outline-none transition-colors placeholder:text-[#4a4a6a] font-mono resize-none"
+          className="w-full min-h-11 bg-[#111118] border text-[#e2e2f0] text-sm px-4 py-3 outline-none transition-colors placeholder:text-[#8888aa] font-mono resize-none"
           style={{
             borderColor: focused === "message" ? "#22d3ee55" : "#1e1e2e",
           }}
         />
       </div>
+      <div className="honeypot" aria-hidden="true">
+        <label htmlFor="website">Leave this field empty</label>
+        <input
+          id="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={form.website}
+          onChange={(event) => setForm({ ...form, website: event.target.value })}
+        />
+      </div>
+      <p className="text-xs leading-relaxed text-[#8888aa]">
+        Your message is sent through FormSubmit to my email. If the form is unavailable, email me directly at{" "}
+        <a className="text-[#22d3ee] hover:underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+      </p>
       {error && <p className="text-sm text-[#f97316]" role="alert">{error}</p>}
-      <button type="submit" className="cta-btn-solid w-full" disabled={isSending}>
+      <button type="submit" className="cta-btn-solid min-h-11 w-full" disabled={isSending}>
         {isSending ? "Sending..." : "Send Message"}
       </button>
     </form>

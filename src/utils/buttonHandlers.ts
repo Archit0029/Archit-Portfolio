@@ -11,7 +11,7 @@ let shareInFlight = false;
 let contactSubmitInFlight = false;
 const contactSubmitCooldownMs = 60_000;
 const contactSubmitTimestampKey = 'portfolio.contact.last-submit';
-const contactRecipient = 'architbishnoi31@gmail.com';
+const contactRecipient = portfolioData.CONTACT_EMAIL;
 
 function buildResumeHtml() {
   const { profile, education, skillGroups, experience, projects, certifications } = portfolioData;

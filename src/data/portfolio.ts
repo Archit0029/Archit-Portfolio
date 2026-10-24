@@ -11,24 +11,26 @@ import type {
   Stat,
 } from '../types';
 
+export const CONTACT_EMAIL = 'architbishnoi177@gmail.com';
+
 export const profile = {
   name: 'Archit Bishnoi',
   title: 'BCA Student • Full-Stack Web & Mobile Developer',
   status: 'Driven BCA student open to internships and project opportunities',
-  university: 'Bachelor of Computer Applications (BCA), CGC College, Jhanjhari, Punjab',
-  bio: 'Driven BCA student with hands-on experience in full-stack web and mobile app development, specializing in HTML, CSS, JavaScript, Java, Firebase, and Flutter. I build real-world solutions for e-commerce, delivery, and social media use cases, blending technical skill with business insight and problem-solving focus.',
+  university: 'Bachelor of Computer Applications (BCA), CGC Jhanjeri, Mohali, Punjab',
+  bio: 'BCA student with project and internship experience in web and mobile application development using JavaScript, React, Firebase, and Flutter.',
   completion: 100,
   image: 'https://avatars.githubusercontent.com/u/214365719?v=4',
   coverImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
-  email: 'architbishnoi177@gmail.com',
+  email: CONTACT_EMAIL,
   phone: '+91 6284946919',
   address: 'Mohali, Punjab, India',
 };
 
 export const stats: Stat[] = [
-  { label: 'Projects built', value: '7+' },
-  { label: 'Certifications', value: '15+' },
-  { label: 'Skill areas', value: '6+' },
+  { label: 'Featured projects', value: '3' },
+  { label: 'Verified certificates', value: '3' },
+  { label: 'Skill areas', value: '4' },
 ];
 
 export const analytics: AnalyticsStat[] = [
@@ -40,7 +42,7 @@ export const analytics: AnalyticsStat[] = [
 
 export const education: EducationItem[] = [
   {
-    institution: 'CGC College, Jhanjhari',
+    institution: 'CGC Jhanjeri, Mohali',
     degree: 'Bachelor of Computer Applications (BCA)',
     period: '2025 – 2028',
     description: 'Pursuing BCA with practical app development projects and technology-driven solutions.',
@@ -49,7 +51,7 @@ export const education: EducationItem[] = [
     institution: 'Govt. Model Senior Secondary School, Abohar',
     degree: 'Intermediate of Commerce (I.Com)',
     period: '2023 – 2025',
-    description: 'Completed commerce education with 67% CGPA and foundational business skills.',
+    description: 'Completed Intermediate of Commerce (I.Com).',
   },
 ];
 
@@ -180,7 +182,7 @@ export const achievements: AchievementItem[] = [
   },
   {
     title: 'AI and data certifications',
-    detail: 'Completed multiple AI, cybersecurity, and data presentation certifications from GUVI, Intel, and HP Life.',
+    detail: 'Completed certificates and training from GUVI, Qualcomm Academy, and HP Life.',
   },
   {
     title: 'Commerce and technical blend',
