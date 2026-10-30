@@ -28,7 +28,7 @@ export const profile = {
 };
 
 export const stats: Stat[] = [
-  { label: 'Featured projects', value: '3' },
+  { label: 'Featured projects', value: '4' },
   { label: 'Verified certificates', value: '3' },
   { label: 'Skill areas', value: '4' },
 ];
@@ -74,31 +74,40 @@ export const experience: ExperienceItem[] = [
 
 export const projects: Project[] = [
   {
-    title: 'ServiceArc',
-    description: 'Smart service management platform that connects customers with service providers through a seamless digital interface.',
-    tags: ['Web', 'Service Management', 'Real-Time Tracking'],
-    link: 'https://github.com/Archit0029/ServiceArc',
-    github: 'https://github.com/Archit0029/ServiceArc',
-    demo: 'https://github.com/Archit0029/ServiceArc',
-    highlight: 'Service request and provider task management',
+    title: 'Smart-Compiler',
+    description: 'An online multi-language cloud IDE and code editor supporting 16+ programming languages, interactive stdin, and Monaco-grade editing.',
+    tags: ['JavaScript', 'Monaco Editor', 'Cloud IDE', 'Compiler'],
+    link: 'https://smartcompiler-swart.vercel.app',
+    github: 'https://github.com/Archit0029/Smart-Compiler',
+    demo: 'https://smartcompiler-swart.vercel.app',
+    highlight: 'Online multi-language cloud compiler with live execution',
   },
   {
-    title: 'Web Development Online',
-    description: 'Web development learning resources and demo projects created to teach frontend fundamentals.',
-    tags: ['HTML', 'CSS', 'Web'],
-    link: 'https://github.com/Archit0029/Web-Development-online',
-    github: 'https://github.com/Archit0029/Web-Development-online',
-    demo: 'https://github.com/Archit0029/Web-Development-online',
-    highlight: 'Frontend development showcase',
+    title: 'Price_Predictions_of_used_mobiles',
+    description: 'An end-to-end Machine Learning web application predicting realistic secondary resale valuation of used mobile phones with depreciation modeling.',
+    tags: ['Python', 'Machine Learning', 'FastAPI', 'Scikit-Learn'],
+    link: 'https://pricepredictions.vercel.app/',
+    github: 'https://github.com/Archit0029/Price_Predictions_of_used_mobiles',
+    demo: 'https://pricepredictions.vercel.app/',
+    highlight: 'Data-driven mobile resale valuation and depreciation model',
   },
   {
-    title: 'CampusConnect',
-    description: 'Campus community app designed to connect students, manage campus resources, and share event information.',
-    tags: ['Campus', 'Community', 'Web'],
-    link: 'https://github.com/Archit0029/CampusConnect',
-    github: 'https://github.com/Archit0029/CampusConnect',
-    demo: 'https://github.com/Archit0029/CampusConnect',
-    highlight: 'Student networking and campus resource sharing',
+    title: 'Archit-Portfolio',
+    description: 'Modern, high-performance developer portfolio featuring responsive design, verified credentials, live GitHub contributions, and contact options.',
+    tags: ['React', 'TypeScript', 'Tailwind CSS', 'Vite'],
+    link: 'https://architbishnoi-portfolio.vercel.app/',
+    github: 'https://github.com/Archit0029/Archit-Portfolio',
+    demo: 'https://architbishnoi-portfolio.vercel.app/',
+    highlight: 'High-performance responsive developer portfolio',
+  },
+  {
+    title: 'file-converter-website',
+    description: 'A universal web-based file conversion platform supporting format transformations for PDFs, images, audio, video, and OCR text extraction.',
+    tags: ['Python', 'Flask', 'File Processing', 'Tesseract OCR'],
+    link: 'https://ab-file-convertern-archit-bishnoi.onrender.com/',
+    github: 'https://github.com/Archit0029/file-converter-website',
+    demo: 'https://ab-file-convertern-archit-bishnoi.onrender.com/',
+    highlight: 'Universal multi-format media and document converter',
   },
 ];
 

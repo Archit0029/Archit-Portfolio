@@ -13,27 +13,39 @@ const SKILL_GROUPS = [
 const FEATURED_PROJECTS: GitHubProject[] = [
   {
     id: "01",
-    title: "ServiceArc",
-    desc: "A service management project focused on connecting customers with service providers.",
-    tags: ["Web", "Service Management", "Real-Time Tracking"],
+    title: "Smart-Compiler",
+    desc: "An online multi-language cloud IDE and code editor supporting 16+ programming languages, interactive standard input, and Monaco-grade code editing.",
+    tags: ["JavaScript", "Monaco Editor", "Compiler", "Cloud IDE"],
     color: "#22d3ee",
-    link: "https://github.com/Archit0029/ServiceArc",
+    link: "https://smartcompiler-swart.vercel.app",
+    github: "https://github.com/Archit0029/Smart-Compiler",
   },
   {
     id: "02",
-    title: "CampusConnect",
-    desc: "A campus community project for student connections, campus resources, and event information.",
-    tags: ["Campus", "Community", "Web"],
+    title: "Price_Predictions_of_used_mobiles",
+    desc: "An end-to-end Machine Learning web application predicting realistic secondary resale valuation of used smartphones with depreciation modeling.",
+    tags: ["Python", "Machine Learning", "FastAPI", "Scikit-Learn"],
     color: "#a78bfa",
-    link: "https://github.com/Archit0029/CampusConnect",
+    link: "https://pricepredictions.vercel.app/",
+    github: "https://github.com/Archit0029/Price_Predictions_of_used_mobiles",
   },
   {
     id: "03",
-    title: "Web Development Online",
-    desc: "Web development learning resources and frontend demonstration projects.",
-    tags: ["HTML", "CSS", "Web"],
+    title: "Archit-Portfolio",
+    desc: "Modern editorial developer portfolio featuring responsive design, verified credentials, active GitHub contributions, and instant contact options.",
+    tags: ["React", "TypeScript", "Tailwind CSS", "Vite"],
     color: "#f97316",
-    link: "https://github.com/Archit0029/Web-Development-online",
+    link: "https://architbishnoi-portfolio.vercel.app/",
+    github: "https://github.com/Archit0029/Archit-Portfolio",
+  },
+  {
+    id: "04",
+    title: "file-converter-website",
+    desc: "A universal web-based file conversion platform supporting format transformations for PDFs, images, audio, video, and OCR text extraction.",
+    tags: ["Python", "Flask", "File Processing", "Tesseract OCR"],
+    color: "#10b981",
+    link: "https://ab-file-convertern-archit-bishnoi.onrender.com/",
+    github: "https://github.com/Archit0029/file-converter-website",
   },
 ];
 
@@ -90,43 +102,86 @@ function ProjectCard({ project, index, reducedMotion }: { project: GitHubProject
   return (
     <div
       ref={ref}
-      className="project-card p-8 rounded-none"
+      className="project-card p-8 rounded-none flex flex-col justify-between"
       style={{
         opacity: reducedMotion || visible ? 1 : 0,
         transform: reducedMotion || visible ? "translateY(0)" : "translateY(40px)",
         transition: reducedMotion ? "none" : `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`,
       }}
     >
-      <div className="flex items-start justify-between mb-6">
-        <span
-          className="text-5xl font-display font-black opacity-20"
-          style={{ color: project.color, fontFamily: "Fraunces, serif" }}
+      <div>
+        <div className="flex items-start justify-between mb-6">
+          <span
+            className="text-5xl font-display font-black opacity-20"
+            style={{ color: project.color, fontFamily: "Fraunces, serif" }}
+          >
+            {project.id}
+          </span>
+          <div className="flex items-center gap-2">
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="min-h-11 min-w-11 border border-[#1e1e2e] flex items-center justify-center hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all duration-200 text-[#8888aa]"
+                aria-label={`View ${project.title} on GitHub`}
+                title="View GitHub Repository"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+              </a>
+            )}
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-h-11 min-w-11 border border-[#1e1e2e] flex items-center justify-center hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all duration-200 text-[#8888aa]"
+              aria-label={`Open live link for ${project.title}`}
+              title="Open Live Link"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <h3
+          className="text-2xl font-black mb-3"
+          style={{ fontFamily: "Fraunces, serif", color: project.color }}
         >
-          {project.id}
-        </span>
-        <a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="min-h-11 min-w-11 border border-[#1e1e2e] flex items-center justify-center hover:border-[#22d3ee] hover:text-[#22d3ee] transition-all duration-200 text-[#8888aa]"
-          aria-label={`View ${project.title} on GitHub`}
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
+          {project.title}
+        </h3>
+        <p className="text-[#8888aa] text-sm leading-relaxed mb-6">{project.desc}</p>
       </div>
-      <h3
-        className="text-2xl font-black mb-3"
-        style={{ fontFamily: "Fraunces, serif", color: project.color }}
-      >
-        {project.title}
-      </h3>
-      <p className="text-[#8888aa] text-sm leading-relaxed mb-6">{project.desc}</p>
-      <div className="flex flex-wrap gap-2">
-        {project.tags.map((tag) => (
-          <span key={tag} className="tag-pill">{tag}</span>
-        ))}
+      <div>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {project.tags.map((tag) => (
+            <span key={tag} className="tag-pill">{tag}</span>
+          ))}
+        </div>
+        <div className="pt-4 border-t border-[#1e1e2e40] flex items-center justify-between text-xs font-mono">
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#22d3ee] hover:underline flex items-center gap-1.5"
+          >
+            <span>Live Preview</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+          {project.github && (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#8888aa] hover:text-[#e2e2f0] flex items-center gap-1.5"
+            >
+              <span>GitHub</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

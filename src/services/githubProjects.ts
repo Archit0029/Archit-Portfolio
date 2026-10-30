@@ -5,6 +5,7 @@ export type GitHubProject = {
   tags: string[];
   color: string;
   link: string;
+  github?: string;
 };
 
 type GitHubRepository = {
@@ -19,22 +20,64 @@ type GitHubRepository = {
 };
 
 const githubUsername = "Archit0029";
-const cacheKey = "portfolio.github-projects.v1";
+const cacheKey = "portfolio.github-projects.v2";
 const cacheDurationMs = 10 * 24 * 60 * 60 * 1000;
 const projectColors = ["#22d3ee", "#a78bfa", "#f97316", "#10b981"];
 
+const ALLOWED_PROJECTS = [
+  "Smart-Compiler",
+  "Price_Predictions_of_used_mobiles",
+  "Archit-Portfolio",
+  "file-converter-website",
+];
+
+const LIVE_LINKS: Record<string, string> = {
+  "Smart-Compiler": "https://smartcompiler-swart.vercel.app",
+  "Price_Predictions_of_used_mobiles": "https://pricepredictions.vercel.app/",
+  "Archit-Portfolio": "https://architbishnoi-portfolio.vercel.app/",
+  "file-converter-website": "https://ab-file-convertern-archit-bishnoi.onrender.com/",
+};
+
+const PROJECT_DESCRIPTIONS: Record<string, string> = {
+  "Smart-Compiler":
+    "An online multi-language cloud IDE and code editor supporting 16+ programming languages, interactive standard input, and Monaco-grade code editing.",
+  "Price_Predictions_of_used_mobiles":
+    "An end-to-end Machine Learning web application predicting realistic secondary resale valuation of used smartphones with depreciation modeling.",
+  "Archit-Portfolio":
+    "Modern editorial developer portfolio featuring responsive design, verified credentials, active GitHub contributions, and instant contact options.",
+  "file-converter-website":
+    "A universal web-based file conversion platform supporting format transformations for PDFs, images, audio, video, and OCR text extraction.",
+};
+
+const PROJECT_TAGS: Record<string, string[]> = {
+  "Smart-Compiler": ["JavaScript", "Monaco Editor", "Compiler", "Cloud IDE"],
+  "Price_Predictions_of_used_mobiles": ["Python", "Machine Learning", "FastAPI", "Scikit-Learn"],
+  "Archit-Portfolio": ["React", "TypeScript", "Tailwind CSS", "Vite"],
+  "file-converter-website": ["Python", "Flask", "File Processing", "Tesseract OCR"],
+};
+
 function toProject(repository: GitHubRepository, index: number): GitHubProject {
-  const tags = [repository.language, ...(repository.topics ?? [])]
-    .filter((tag): tag is string => Boolean(tag))
-    .slice(0, 4);
+  const dynamicTags = [repository.language, ...(repository.topics ?? [])]
+    .filter((tag): tag is string => Boolean(tag));
+  const fallbackTags = PROJECT_TAGS[repository.name] ?? ["GitHub"];
+  const tags = dynamicTags.length ? dynamicTags.slice(0, 4) : fallbackTags;
+
+  const liveLink =
+    repository.homepage ||
+    LIVE_LINKS[repository.name] ||
+    repository.html_url;
 
   return {
     id: String(index + 1).padStart(2, "0"),
     title: repository.name,
-    desc: repository.description || "A project built and maintained on GitHub.",
-    tags: tags.length ? tags : ["GitHub"],
+    desc:
+      repository.description ||
+      PROJECT_DESCRIPTIONS[repository.name] ||
+      "A project built and maintained on GitHub.",
+    tags,
     color: projectColors[index % projectColors.length],
-    link: repository.homepage || repository.html_url,
+    link: liveLink,
+    github: repository.html_url,
   };
 }
 
@@ -64,13 +107,22 @@ export async function fetchGitHubProjects(fallback: GitHubProject[]): Promise<Gi
 
   try {
     const response = await fetch(
-      `https://api.github.com/users/${githubUsername}/repos?sort=updated&direction=desc&per_page=8`,
+      `https://api.github.com/users/${githubUsername}/repos?per_page=100`,
       { headers: { Accept: "application/vnd.github+json" } },
     );
     if (!response.ok) throw new Error(`GitHub API returned ${response.status}`);
 
     const repositories = (await response.json()) as GitHubRepository[];
-    const projects = repositories.filter((repository) => !repository.fork).map(toProject);
+    const filteredRepos = repositories.filter(
+      (repository) => !repository.fork && ALLOWED_PROJECTS.includes(repository.name),
+    );
+
+    // Sort according to ALLOWED_PROJECTS order
+    filteredRepos.sort(
+      (a, b) => ALLOWED_PROJECTS.indexOf(a.name) - ALLOWED_PROJECTS.indexOf(b.name),
+    );
+
+    const projects = filteredRepos.map(toProject);
     if (!projects.length) return fallback;
 
     cacheProjects(projects);
